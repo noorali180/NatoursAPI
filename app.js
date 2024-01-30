@@ -1,6 +1,5 @@
 const fs = require("fs");
 const express = require("express");
-const bodyParser = require("body-parser");
 
 const app = express();
 
@@ -8,8 +7,7 @@ const app = express();
 /**
  * middleware sits between req and res, to do something after req gets something, can modify the incoming req data...
  */
-// app.use(express.json());
-app.use(bodyParser.json());
+app.use(express.json());
 
 // // send a get request to particular port when specified route is hit...
 // app.get("/", (req, res) => {
@@ -44,23 +42,21 @@ app.get("/api/v1/tours", (req, res) => {
 });
 
 // route to handle post request for tours data...
-app.post("api/v1/tours", (req, res) => {
-  // const newId = tours[tours.length - 1].id + 1;
-  // const newTour = Object.assign({ id: newId }, req.body);
+app.post("/api/v1/tours", (req, res) => {
+  const newId = tours[tours.length - 1].id + 1;
+  const newTour = Object.assign({ id: newId }, req.body);
 
-  // // adding the new tour to tours array...
-  // tours.push(newTour);
-  // // writing the new tour to tours file (in database later)
-  // fs.writeFile(
-  //   `${__dirname}/dev-data/data/tours-simple.json`,
-  //   JSON.stringify({ id: tourId, newTour }),
-  //   (err) => {
-  //     console.log(err.message);
-  //   }
-  // );
-  console.log(req.body);
+  tours.push(newTour);
 
-  res.status(200).send("got a post request");
+  fs.appendFile(
+    `${__dirname}/dev-data/data/tours-simple`,
+    JSON.stringify(newTour),
+    (err) => {
+      if (err) res.send(err);
+    }
+  );
+
+  res.send("post req is responding");
 });
 
 const port = 3000;
