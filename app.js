@@ -30,16 +30,7 @@ const tours = JSON.parse(
 );
 
 // route to handle get request for tours data...
-app.get("/api/v1/tours", (req, res) => {
-  res.status(200).json({
-    status: "success",
-    message: "successfully fetched the tours",
-    results: tours.length,
-    data: {
-      tours,
-    },
-  });
-});
+app.get("/api/v1/tours", );
 
 // getting a single tour by id, using req.params...
 app.get("/api/v1/tours/:id", (req, res) => {
@@ -52,7 +43,7 @@ app.get("/api/v1/tours/:id", (req, res) => {
       message: "INVALID_ID",
     });
 
-  res.status(200).json({
+  res.status(201).json({
     status: "success",
     message: "successfully fetched the tour",
     data: {
@@ -71,9 +62,9 @@ app.post("/api/v1/tours", (req, res) => {
 
   tours.push(newTour);
 
-  fs.appendFile(
-    `${__dirname}/dev-data/data/tours-simple`,
-    JSON.stringify(newTour),
+  fs.writeFile(
+    `${__dirname}/dev-data/data/tours-simple.json`,
+    JSON.stringify(tours),
     (err) => {
       if (err)
         res
@@ -82,7 +73,7 @@ app.post("/api/v1/tours", (req, res) => {
     }
   );
 
-  res.status(201).json({
+  res.status(200).json({
     status: "success",
     message: "successfully added into the tours",
     data: {
@@ -99,12 +90,40 @@ app.patch("/api/v1/tours/:id", (req, res) => {
   if (!tour)
     return res.status(404).json({ status: "fail", message: "INVALID_ID" });
 
-  res.status(201).json({
+  res.status(203).json({
     status: "success",
     message: "successfully updated the tour",
     data: {
       tour: "updated tour here",
     },
+  });
+});
+
+// route to handle a delete request...
+app.delete("/api/v1/tours/:id", (req, res) => {
+  const id = +req.params.id;
+  const tourIndex = tours.findIndex((tour) => tour.id === id);
+
+  if (tourIndex === -1)
+    return res.status(404).json({ status: "fail", message: "INVALID_ID" });
+
+  tours.splice(tourIndex, 1);
+
+  fs.writeFile(
+    `${__dirname}/dev-data/data/tours-simple.json`,
+    JSON.stringify(tours),
+    (err) => {
+      if (err)
+        res
+          .status(404)
+          .json({ status: "fail", message: "failed to update the file" });
+    }
+  );
+
+  res.status(204).json({
+    status: "success",
+    message: "successfully deleted the tour",
+    data: { tourIndex },
   });
 });
 
