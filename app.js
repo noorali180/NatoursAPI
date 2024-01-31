@@ -4,15 +4,14 @@ const morgan = require("morgan");
 
 const app = express();
 
+const tours = JSON.parse(
+  fs.readFileSync(`${__dirname}/dev-data/data/tours-simple.json`, "utf8")
+);
+
 /////////////////////////// 1). MIDDLEWARES /////////////////////////////////////
 
 app.use(morgan("dev")); // middleware for logging request details,
 
-// middleware to send data through post request,
-/**
- * middleware sits between req and res, to do something after req gets something, can modify the incoming req data...
- */
-// NOTE: use function is used to add middleware to middleware stack... we can create our own custom middlewares and can add them to middleware stack easily by using use function...
 app.use(express.json());
 
 // creating a custom middleware...
@@ -21,26 +20,6 @@ app.use((req, res, next) => {
 
   next();
 });
-
-// // send a get request to particular port when specified route is hit...
-// app.get("/", (req, res) => {
-//   res.status(200).send("this is the home page...");
-
-//   // NOTE: we can also use json() method to get/post json data from server, which automatically sets the "content-type" to "application/json" in header...
-//   // res
-//   //   .status(200)
-//   //   .json({ message: 'this is json data', app: 'from natours app' });
-// });
-
-// // sends a post request to particular port when specified route is hit...
-// app.post("/", (req, res) => {
-//   res.send("now you can do a post request to server...");
-// });
-
-// reading data from local file, later data will come from the database...
-const tours = JSON.parse(
-  fs.readFileSync(`${__dirname}/dev-data/data/tours-simple.json`, "utf8")
-);
 
 /////////////////////////// 2). ROUTE HANDLERS /////////////////////////////////////
 
