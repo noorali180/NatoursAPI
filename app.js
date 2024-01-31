@@ -32,120 +32,111 @@ const tours = JSON.parse(
 /////////////////////// FUNCTIONS ///////////////////////////////
 
 // function to get all the tours...
-function getAllTours() {
-  (req, res) => {
-    res.status(200).json({
-      status: "success",
-      message: "successfully fetched the tours",
-      results: tours.length,
-      data: {
-        tours,
-      },
-    });
-  };
+function getAllTours(req, res) {
+  res.status(200).json({
+    status: "success",
+    message: "successfully fetched the tours",
+    results: tours.length,
+    data: {
+      tours,
+    },
+  });
 }
 
 // function to get a single tour...
-function getTour() {
-  (req, res) => {
-    const id = +req.params.id;
-    const tour = tours.find((tour) => tour.id === id);
+function getTour(req, res) {
+  const id = +req.params.id;
+  const tour = tours.find((tour) => tour.id === id);
 
-    if (!tour)
-      return res.status(404).json({
-        status: "fail",
-        message: "INVALID_ID",
-      });
-
-    res.status(201).json({
-      status: "success",
-      message: "successfully fetched the tour",
-      data: {
-        tour,
-      },
+  if (!tour)
+    return res.status(404).json({
+      status: "fail",
+      message: "INVALID_ID",
     });
-  };
+
+  res.status(201).json({
+    status: "success",
+    message: "successfully fetched the tour",
+    data: {
+      tour,
+    },
+  });
 }
 
 // function to create a new tour...
-function createTour() {
-  (req, res) => {
-    const newId = tours[tours.length - 1].id + 1;
-    const newTour = Object.assign({ id: newId }, req.body);
+function createTour(req, res) {
+  const newId = tours[tours.length - 1].id + 1;
+  const newTour = Object.assign({ id: newId }, req.body);
 
-    tours.push(newTour);
+  tours.push(newTour);
 
-    fs.writeFile(
-      `${__dirname}/dev-data/data/tours-simple.json`,
-      JSON.stringify(tours),
-      (err) => {
-        if (err)
-          res
-            .status(404)
-            .json({ status: "fail", message: "failed to update the file" });
-      }
-    );
+  fs.writeFile(
+    `${__dirname}/dev-data/data/tours-simple.json`,
+    JSON.stringify(tours),
+    (err) => {
+      if (err)
+        res
+          .status(404)
+          .json({ status: "fail", message: "failed to update the file" });
+    }
+  );
 
-    res.status(200).json({
-      status: "success",
-      message: "successfully added into the tours",
-      data: {
-        tours,
-      },
-    });
-  };
+  res.status(200).json({
+    status: "success",
+    message: "successfully added into the tours",
+    data: {
+      tours,
+    },
+  });
 }
 
 // function to update an existing tour...
-function updateTour() {
-  (req, res) => {
-    const id = +req.params.id;
-    const tour = tours.find((tour) => tour.id === id);
+function updateTour(req, res) {
+  const id = +req.params.id;
+  const tour = tours.find((tour) => tour.id === id);
 
-    if (!tour)
-      return res.status(404).json({ status: "fail", message: "INVALID_ID" });
+  if (!tour)
+    return res.status(404).json({ status: "fail", message: "INVALID_ID" });
 
-    res.status(203).json({
-      status: "success",
-      message: "successfully updated the tour",
-      data: {
-        tour: "updated tour here",
-      },
-    });
-  };
+  res.status(203).json({
+    status: "success",
+    message: "successfully updated the tour",
+    data: {
+      tour: "updated tour here",
+    },
+  });
 }
 
 // function to delete a tour...
-function deleteTour() {
-  (req, res) => {
-    const id = +req.params.id;
-    const tourIndex = tours.findIndex((tour) => tour.id === id);
+function deleteTour(req, res) {
+  const id = +req.params.id;
+  const tourIndex = tours.findIndex((tour) => tour.id === id);
 
-    if (tourIndex === -1)
-      return res.status(404).json({ status: "fail", message: "INVALID_ID" });
+  if (tourIndex === -1)
+    return res.status(404).json({ status: "fail", message: "INVALID_ID" });
 
-    tours.splice(tourIndex, 1);
+  tours.splice(tourIndex, 1);
 
-    fs.writeFile(
-      `${__dirname}/dev-data/data/tours-simple.json`,
-      JSON.stringify(tours),
-      (err) => {
-        if (err)
-          res
-            .status(404)
-            .json({ status: "fail", message: "failed to update the file" });
-      }
-    );
+  fs.writeFile(
+    `${__dirname}/dev-data/data/tours-simple.json`,
+    JSON.stringify(tours),
+    (err) => {
+      if (err)
+        res
+          .status(404)
+          .json({ status: "fail", message: "failed to update the file" });
+    }
+  );
 
-    res.status(204).json({
-      status: "success",
-      message: "successfully deleted the tour",
-      data: { tourIndex },
-    });
-  };
+  res.status(204).json({
+    status: "success",
+    message: "successfully deleted the tour",
+    data: { tourIndex },
+  });
 }
 
 ///////////////// ROUTES //////////////////////////////
+
 // route to handle get request for tours data...
 app.get("/api/v1/tours", getAllTours);
 
