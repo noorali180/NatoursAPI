@@ -137,6 +137,8 @@ function deleteTour(req, res) {
 
 ///////////////// ROUTES //////////////////////////////
 
+/*
+
 // route to handle get request for tours data...
 app.get("/api/v1/tours", getAllTours);
 
@@ -154,6 +156,17 @@ app.patch("/api/v1/tours/:id", updateTour);
 
 // route to handle a delete request...
 app.delete("/api/v1/tours/:id", deleteTour);
+
+*/
+
+// NOTE: we can also chain the routes, by using route() from express, which basically acts as a middleware...
+
+app.route("/api/v1/tours").get(getAllTours).post(createTour);
+app
+  .route("/api/v1/tours/:id")
+  .get(getTour)
+  .patch(updateTour)
+  .delete(deleteTour);
 
 //////////////////////////////////////
 
