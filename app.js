@@ -164,6 +164,26 @@ function deleteTour(req, res) {
   });
 }
 
+function getAllUsers(req, res) {
+  res.status(500).json({ status: "failed", message: "route not defined" });
+}
+
+function getUser(req, res) {
+  res.status(500).json({ status: "failed", message: "route not defined" });
+}
+
+function createUser(req, res) {
+  res.status(500).json({ status: "failed", message: "route not defined" });
+}
+
+function updateUser(req, res) {
+  res.status(500).json({ status: "failed", message: "route not defined" });
+}
+
+function deleteUser(req, res) {
+  res.status(500).json({ status: "failed", message: "route not defined" });
+}
+
 /////////////////////////// 3). ROUTES /////////////////////////////////////
 
 /*
@@ -196,6 +216,13 @@ app
   .get(getTour)
   .patch(updateTour)
   .delete(deleteTour);
+
+app.route("/api/v1/users").get(getAllUsers).post(createUser);
+app
+  .route("/api/v1/users/:id")
+  .get(getUser)
+  .patch(updateUser)
+  .delete(deleteUser);
 
 /////////////////////////// 4). SERVER /////////////////////////////////////
 
