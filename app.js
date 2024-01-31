@@ -33,11 +33,11 @@ const tours = JSON.parse(
 app.get("/api/v1/tours", (req, res) => {
   res.status(200).json({
     status: "success",
+    message: "successfully fetched the tours",
     results: tours.length,
     data: {
       tours,
     },
-    error: "error",
   });
 });
 
@@ -52,14 +52,17 @@ app.get("/api/v1/tours/:id", (req, res) => {
       message: "INVALID_ID",
     });
 
-  res.status(201).json({
+  res.status(200).json({
     status: "success",
+    message: "successfully fetched the tour",
     data: {
       tour,
     },
-    error: "error",
   });
 });
+// we cans also do, "/api/v1/tours/:id/:some_other/:another_one"...
+// then, req.params = {id: "", some_other: "", another_one: ""}
+// we can also use optional parameters... "/api/v1/tours/:id/:some_other?/:another_one?"...
 
 // route to handle post request for tours data...
 app.post("/api/v1/tours", (req, res) => {
@@ -72,15 +75,43 @@ app.post("/api/v1/tours", (req, res) => {
     `${__dirname}/dev-data/data/tours-simple`,
     JSON.stringify(newTour),
     (err) => {
-      if (err) res.send(err);
+      if (err)
+        res
+          .status(404)
+          .json({ status: "fail", message: "failed to update the file" });
     }
   );
 
-  res.send("post req is responding");
+  res.status(201).json({
+    status: "success",
+    message: "successfully added into the tours",
+    data: {
+      tours,
+    },
+  });
 });
+
+// route to handle a patch request...
+app.patch("/api/v1/tours/:id", (req, res) => {
+  const id = +req.params.id;
+  const tour = tours.find((tour) => tour.id === id);
+
+  if (!tour)
+    return res.status(404).json({ status: "fail", message: "INVALID_ID" });
+
+  res.status(201).json({
+    status: "success",
+    message: "successfully updated the tour",
+    data: {
+      tour: "updated tour here",
+    },
+  });
+});
+
+//////////////////////////////////////
 
 const port = 3000;
 
 app.listen(port, () => {
-  console.log(`app is listening on port ${port}.`);
+  console.log(`app is listening on port ${port}...`);
 });
