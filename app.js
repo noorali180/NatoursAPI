@@ -186,43 +186,19 @@ function deleteUser(req, res) {
 
 /////////////////////////// 3). ROUTES /////////////////////////////////////
 
-/*
+// using a router means to create a sub / mini application inside the application by, mounting the middleware Router to the specific pahts... according to defined resources
 
-// route to handle get request for tours data...
-app.get("/api/v1/tours", getAllTours);
+const toursRouter = express.Router();
+const usersRouter = express.Router();
 
-// getting a single tour by id, using req.params...
-app.get("/api/v1/tours/:id", getTour);
-// we cans also do, "/api/v1/tours/:id/:some_other/:another_one"...
-// then, req.params = {id: "", some_other: "", another_one: ""}
-// we can also use optional parameters... "/api/v1/tours/:id/:some_other?/:another_one?"...
+toursRouter.route("/").get(getAllTours).post(createTour);
+toursRouter.route("/:id").get(getTour).patch(updateTour).delete(deleteTour);
 
-// route to handle post request for tours data...
-app.post("/api/v1/tours", createTour);
+usersRouter.route("/").get(getAllUsers).post(createUser);
+usersRouter.route("/:id").get(getUser).patch(updateUser).delete(deleteUser);
 
-// route to handle a patch request...
-app.patch("/api/v1/tours/:id", updateTour);
-
-// route to handle a delete request...
-app.delete("/api/v1/tours/:id", deleteTour);
-
-*/
-
-// NOTE: we can also chain the routes, by using route() from express, which basically acts as a middleware...
-
-app.route("/api/v1/tours").get(getAllTours).post(createTour);
-app
-  .route("/api/v1/tours/:id")
-  .get(getTour)
-  .patch(updateTour)
-  .delete(deleteTour);
-
-app.route("/api/v1/users").get(getAllUsers).post(createUser);
-app
-  .route("/api/v1/users/:id")
-  .get(getUser)
-  .patch(updateUser)
-  .delete(deleteUser);
+app.use("/api/v1/tours", toursRouter);
+app.use("/api/v1/users", usersRouter);
 
 /////////////////////////// 4). SERVER /////////////////////////////////////
 
