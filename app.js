@@ -29,6 +29,8 @@ const tours = JSON.parse(
   fs.readFileSync(`${__dirname}/dev-data/data/tours-simple.json`, "utf8")
 );
 
+/////////////////////// FUNCTIONS ///////////////////////////////
+
 // function to get all the tours...
 function getAllTours() {
   (req, res) => {
