@@ -3,11 +3,21 @@ const express = require("express");
 
 const app = express();
 
+/////////////////////////// 1). MIDDLEWARES /////////////////////////////////////
+
 // middleware to send data through post request,
 /**
  * middleware sits between req and res, to do something after req gets something, can modify the incoming req data...
  */
+// NOTE: use function is used to add middleware to middleware stack... we can create our own custom middlewares and can add them to middleware stack easily by using use function...
 app.use(express.json());
+
+// creating a custom middleware...
+app.use((req, res, next) => {
+  req.requestedTime = new Date().toISOString();
+
+  next();
+});
 
 // // send a get request to particular port when specified route is hit...
 // app.get("/", (req, res) => {
@@ -29,13 +39,14 @@ const tours = JSON.parse(
   fs.readFileSync(`${__dirname}/dev-data/data/tours-simple.json`, "utf8")
 );
 
-/////////////////////// FUNCTIONS ///////////////////////////////
+/////////////////////////// 2). ROUTE HANDLERS /////////////////////////////////////
 
 // function to get all the tours...
 function getAllTours(req, res) {
   res.status(200).json({
     status: "success",
     message: "successfully fetched the tours",
+    requestedTime: req.requestedTime,
     results: tours.length,
     data: {
       tours,
@@ -52,11 +63,13 @@ function getTour(req, res) {
     return res.status(404).json({
       status: "fail",
       message: "INVALID_ID",
+      requestedTime: req.requestedTime,
     });
 
   res.status(201).json({
     status: "success",
     message: "successfully fetched the tour",
+    requestedTime: req.requestedTime,
     data: {
       tour,
     },
@@ -75,15 +88,18 @@ function createTour(req, res) {
     JSON.stringify(tours),
     (err) => {
       if (err)
-        res
-          .status(404)
-          .json({ status: "fail", message: "failed to update the file" });
+        res.status(404).json({
+          status: "fail",
+          message: "failed to update the file",
+          requestedTime: req.requestedTime,
+        });
     }
   );
 
   res.status(200).json({
     status: "success",
     message: "successfully added into the tours",
+    requestedTime: req.requestedTime,
     data: {
       tours,
     },
@@ -96,11 +112,16 @@ function updateTour(req, res) {
   const tour = tours.find((tour) => tour.id === id);
 
   if (!tour)
-    return res.status(404).json({ status: "fail", message: "INVALID_ID" });
+    return res.status(404).json({
+      status: "fail",
+      message: "INVALID_ID",
+      requestedTime: req.requestedTime,
+    });
 
   res.status(203).json({
     status: "success",
     message: "successfully updated the tour",
+    requestedTime: req.requestedTime,
     data: {
       tour: "updated tour here",
     },
@@ -113,7 +134,11 @@ function deleteTour(req, res) {
   const tourIndex = tours.findIndex((tour) => tour.id === id);
 
   if (tourIndex === -1)
-    return res.status(404).json({ status: "fail", message: "INVALID_ID" });
+    return res.status(404).json({
+      status: "fail",
+      message: "INVALID_ID",
+      requestedTime: req.requestedTime,
+    });
 
   tours.splice(tourIndex, 1);
 
@@ -131,11 +156,12 @@ function deleteTour(req, res) {
   res.status(204).json({
     status: "success",
     message: "successfully deleted the tour",
+    requestedTime: req.requestedTime,
     data: { tourIndex },
   });
 }
 
-///////////////// ROUTES //////////////////////////////
+/////////////////////////// 3). ROUTES /////////////////////////////////////
 
 /*
 
@@ -168,7 +194,7 @@ app
   .patch(updateTour)
   .delete(deleteTour);
 
-//////////////////////////////////////
+/////////////////////////// 4). SERVER /////////////////////////////////////
 
 const port = 3000;
 
