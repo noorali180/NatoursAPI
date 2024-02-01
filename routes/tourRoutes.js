@@ -1,6 +1,5 @@
 const express = require("express");
 
-
 const tourController = require("./../controllers/tourController");
 
 const router = express.Router();
@@ -10,7 +9,7 @@ const router = express.Router();
 router
   .route("/")
   .get(tourController.getAllTours)
-  .post(tourController.createTour);
+  .post(tourController.checkNewTour, tourController.createTour); // chaining the checkNewTour custom middleware to post request, whenever post req is made, instead of running the callback, our middleware will run first (useful for validating data whenver req is made)...
 router
   .route("/:id")
   .get(tourController.getTour)
