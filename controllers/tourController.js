@@ -4,8 +4,17 @@ const tours = JSON.parse(
   fs.readFileSync(`${__dirname}/../dev-data/data/tours-simple.json`, "utf8")
 );
 
+// exports.checkId = function (req, res, _next, val) {
+//   if (+req.params.id > tours.length)
+//     return res.status(404).json({
+//       status: "failed",
+//       message: "INVALID_ID",
+//     });
+// };
+
 // function to get all the tours...
 exports.getAllTours = function (req, res) {
+  console.log(req.body);
   res.status(200).json({
     status: "success",
     message: "successfully fetched the tours",
