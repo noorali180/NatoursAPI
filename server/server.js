@@ -41,7 +41,10 @@ const tourSchema = new Schema({
   },
 });
 
+// Tour model, model name's first letter should always be capital, it is a convention...
 const Tour = model("Tour", tourSchema);
+
+////////////////////////////////////////////////////////////////////
 
 const port = process.env.PORT || 3000;
 app.listen(port, () => {
