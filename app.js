@@ -9,7 +9,9 @@ const app = express();
 
 /////////////////////////// 1). MIDDLEWARES /////////////////////////////////////
 
-app.use(morgan("dev")); // middleware for logging request details,
+if (process.env.NODE_ENV === "development") {
+  app.use(morgan("dev")); // middleware for logging request details,
+}
 
 app.use(express.json());
 
