@@ -3,16 +3,24 @@ const fs = require("fs");
 const Tour = require("./../models/tourModel");
 
 // function to get all the tours...
-exports.getAllTours = function (req, res) {
-  res.status(200).json({
-    status: "success",
-    message: "successfully fetched the tours",
-    requestedTime: req.requestedTime,
-    // results: tours.length,
-    // data: {
-    //   tours,
-    // },
-  });
+exports.getAllTours = async function (req, res) {
+  try {
+    const tours = await Tour.find({});
+
+    res.status(200).json({
+      status: "success",
+      requestedTime: req.requestedTime,
+      results: tours.length,
+      data: {
+        tours,
+      },
+    });
+  } catch (err) {
+    res.status(400).json({
+      status: "fail",
+      message: "Cannot fetch Tours!",
+    });
+  }
 };
 
 // function to get a single tour...
@@ -29,7 +37,6 @@ exports.getTour = function (req, res) {
 
   res.status(201).json({
     status: "success",
-    message: "successfully fetched the tour",
     requestedTime: req.requestedTime,
     data: {
       tour,
@@ -38,15 +45,21 @@ exports.getTour = function (req, res) {
 };
 
 // function to create a new tour...
-exports.createTour = function (req, res) {
-  res.status(200).json({
-    status: "success",
-    message: "successfully added into the tours",
-    requestedTime: req.requestedTime,
-    data: {
-      // tours,
-    },
-  });
+exports.createTour = async function (req, res) {
+  try {
+    const newTour = await Tour.create(req.body);
+    console.log(newTour);
+
+    res.status(201).json({
+      status: "success",
+      requestedTime: req.requestedTime,
+      data: {
+        tour: newTour,
+      },
+    });
+  } catch (err) {
+    res.status(400).json({ status: "fail", message: "Invalid Data!" });
+  }
 };
 
 // function to update an existing tour...
@@ -63,7 +76,6 @@ exports.updateTour = function (req, res) {
 
   res.status(203).json({
     status: "success",
-    message: "successfully updated the tour",
     requestedTime: req.requestedTime,
     data: {
       tour: "updated tour here",
@@ -85,7 +97,6 @@ exports.deleteTour = function (req, res) {
 
   res.status(204).json({
     status: "success",
-    message: "successfully deleted the tour",
     requestedTime: req.requestedTime,
     data: { tourIndex },
   });

@@ -1,11 +1,11 @@
-const { Schema, model } = require("mongoose");
+const mongoose = require("mongoose");
 
 // to do CRUD operations we need to create a mongoose model, and for model creation we need a schema...
-const tourSchema = new Schema({
+const tourSchema = new mongoose.Schema({
   name: {
     // we can simply type the name of type of field, but with specifying type with object we can add some extra things in it, like required, unique, default and many more....
     type: String,
-    // requirted: [true/false, "error_message"] --> bascially it is a validator...
+    // required: [true/false, "error_message"] --> basically it is a validator...
     required: [true, "A tour must have a name"],
     unique: true,
   },
@@ -20,6 +20,6 @@ const tourSchema = new Schema({
 });
 
 // Tour model, model name's first letter should always be capital, it is a convention...
-const Tour = model("Tour", tourSchema);
+const Tour = mongoose.model("Tour", tourSchema);
 
-exports.default = Tour;
+module.exports = Tour;
