@@ -43,6 +43,15 @@ exports.getAllTours = async function (req, res) {
       query = query.sort("createdAt");
     }
 
+    // 3). Limiting
+    if (req.query.limit) {
+      const limitTo = req.query.limit;
+
+      query = query.limit(limitTo);
+    } else {
+      query = query.limit(10);
+    }
+
     //// CONSUMING QUERY WITH AWAIT...
     const tours = await query;
 
