@@ -16,7 +16,7 @@ exports.getAllTours = async function (req, res) {
       },
     });
   } catch (err) {
-    res.status(400).json({
+    res.status(404).json({
       status: "fail",
       message: "Cannot fetch Tours!",
     });
@@ -24,24 +24,25 @@ exports.getAllTours = async function (req, res) {
 };
 
 // function to get a single tour...
-exports.getTour = function (req, res) {
-  const id = +req.params.id;
-  const tour = null;
+exports.getTour = async function (req, res) {
+  try {
+    const tour = await Tour.findById(req.params.id);
+    // Tour.findOne({_id: req.params.id});
 
-  if (!tour)
-    return res.status(404).json({
-      status: "fail",
-      message: "INVALID_ID",
+    res.status(200).json({
+      status: "success",
       requestedTime: req.requestedTime,
+      data: {
+        tour,
+      },
     });
-
-  res.status(201).json({
-    status: "success",
-    requestedTime: req.requestedTime,
-    data: {
-      tour,
-    },
-  });
+  } catch (err) {
+    res.status(404).json({
+      status: "fail",
+      requestedTime: req.requestedTime,
+      message: err,
+    });
+  }
 };
 
 // function to create a new tour...
@@ -63,41 +64,45 @@ exports.createTour = async function (req, res) {
 };
 
 // function to update an existing tour...
-exports.updateTour = function (req, res) {
-  const id = +req.params.id;
-  const tour = null;
-
-  if (!tour)
-    return res.status(404).json({
-      status: "fail",
-      message: "INVALID_ID",
-      requestedTime: req.requestedTime,
+exports.updateTour = async function (req, res) {
+  try {
+    const updatedTour = await Tour.findByIdAndUpdate(req.params.id, req.body, {
+      new: true,
+      runValidators: true,
     });
 
-  res.status(203).json({
-    status: "success",
-    requestedTime: req.requestedTime,
-    data: {
-      tour: "updated tour here",
-    },
-  });
+    res.status(201).json({
+      status: "success",
+      requestedTime: req.requestedTime,
+      data: {
+        tour: updatedTour,
+      },
+    });
+  } catch (err) {
+    res.status(404).json({
+      status: "fail",
+      requestedTime: req.requestedTime,
+      message: err,
+    });
+  }
 };
 
 // function to delete a tour...
-exports.deleteTour = function (req, res) {
-  const id = +req.params.id;
-  const tourIndex = -1;
-
-  if (tourIndex === -1)
-    return res.status(404).json({
-      status: "fail",
-      message: "INVALID_ID",
+exports.deleteTour = async function (req, res) {
+  try {
+    const deletedTour = await Tour.findByIdAndDelete(req.params.id);
+    res.status(203).json({
+      status: "success",
       requestedTime: req.requestedTime,
+      data: {
+        tour: deletedTour,
+      },
     });
-
-  res.status(204).json({
-    status: "success",
-    requestedTime: req.requestedTime,
-    data: { tourIndex },
-  });
+  } catch (err) {
+    res.status(404).json({
+      status: "fail",
+      requestedTime: req.requestedTime,
+      message: err,
+    });
+  }
 };
