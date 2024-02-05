@@ -7,15 +7,18 @@ exports.getAllTours = async function (req, res) {
   // console.log(req.query);
   try {
     //// MAKING OF QUERY...
+
     // making a shallow copy of request params objects, so we can avoid mutating the original req.query object...
     const queryObj = { ...req.query };
     const excludedFields = ["page", "sort", "limit", "fields"];
 
-    // 1). filtering
+    // 1A). filtering
+
     // deleting the excluded params from our query if there is any.
     excludedFields.forEach((field) => delete queryObj[field]);
 
-    // 2). advanced filtering
+    // 1B). advanced filtering
+
     // using find method to filter...
     // from req.query ?duration[gte]=5 ==> {duration: {gte: 5}}
     // find({duration: {$gte: 5}})
@@ -28,7 +31,17 @@ exports.getAllTours = async function (req, res) {
     // using regex expression for replacing the fields extra data (gte, gt, lte, lt) ==> field[extra data]
 
     // if we await the initial query of Tour, so we cannot chain other queries to it, thats why we will make the query first and then consume/use it...
-    const query = Tour.find(queryStr);
+    let query = Tour.find(queryStr);
+
+    // 2). Sorting
+    if (req.query.sort) {
+      const sortBy = req.query.sort.split(",").join(" ");
+
+      query = query.sort(sortBy);
+      // query.sort("price ratingsAverage");
+    } else {
+      query = query.sort("createdAt");
+    }
 
     //// CONSUMING QUERY WITH AWAIT...
     const tours = await query;
@@ -52,7 +65,7 @@ exports.getAllTours = async function (req, res) {
   } catch (err) {
     res.status(404).json({
       status: "fail",
-      message: "Cannot fetch Tours!",
+      message: err,
     });
   }
 };
