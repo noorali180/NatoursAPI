@@ -5,8 +5,27 @@ const Tour = require("./../models/tourModel");
 // function to get all the tours...
 exports.getAllTours = async function (req, res) {
   try {
-    const tours = await Tour.find({});
+    //// MAKING OF QUERY...
+    // making a shallow copy of request params objects, so we can avoid mutating the original req.query object...
+    const queryObj = { ...req.query };
+    const excludedParams = ["page", "sort", "filter", "other"];
+    // deleting the excluded params from our query if there is any.
+    excludedParams.forEach((param) => delete queryObj[param]);
 
+    // if we await the initial query of Tour, so we cannot chain other queries to it, thats why we will make the query first and then consume/use it...
+    const query = Tour.find(queryObj);
+
+    //// CONSUMING QUERY WITH AWAIT...
+    const tours = await query;
+
+    // Note: gives same output as above...
+    // const tours = await Tour.find()
+    //   .where("duration")
+    //   .equals("5")
+    //   .where("difficulty")
+    //   .equals("easy");
+
+    //// RESPONSE...
     res.status(200).json({
       status: "success",
       requestedTime: req.requestedTime,
