@@ -4,16 +4,31 @@ const Tour = require("./../models/tourModel");
 
 // function to get all the tours...
 exports.getAllTours = async function (req, res) {
+  // console.log(req.query);
   try {
     //// MAKING OF QUERY...
     // making a shallow copy of request params objects, so we can avoid mutating the original req.query object...
     const queryObj = { ...req.query };
-    const excludedParams = ["page", "sort", "filter", "other"];
+    const excludedFields = ["page", "sort", "limit", "fields"];
+
+    // 1). filtering
     // deleting the excluded params from our query if there is any.
-    excludedParams.forEach((param) => delete queryObj[param]);
+    excludedFields.forEach((field) => delete queryObj[field]);
+
+    // 2). advanced filtering
+    // using find method to filter...
+    // from req.query ?duration[gte]=5 ==> {duration: {gte: 5}}
+    // find({duration: {$gte: 5}})
+
+    // converting queryObj to make the query suitable for using in find method to filter the data...
+    let queryStr = JSON.stringify(queryObj);
+    queryStr = JSON.parse(
+      queryStr.replace(/\b(gte|gt|lte|lt)\b/g, (match) => `$${match}`)
+    );
+    // using regex expression for replacing the fields extra data (gte, gt, lte, lt) ==> field[extra data]
 
     // if we await the initial query of Tour, so we cannot chain other queries to it, thats why we will make the query first and then consume/use it...
-    const query = Tour.find(queryObj);
+    const query = Tour.find(queryStr);
 
     //// CONSUMING QUERY WITH AWAIT...
     const tours = await query;
