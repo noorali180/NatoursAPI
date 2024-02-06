@@ -14,10 +14,14 @@ exports.getAllTours = async function (req, res) {
 
     // 1A). filtering
 
+    // query => 127.0.0.1:3000/api/v1/tours?difficulty=easy&price=500
+
     // deleting the excluded params from our query if there is any.
     excludedFields.forEach((field) => delete queryObj[field]);
 
     // 1B). advanced filtering
+
+    // query => 127.0.0.1:3000/api/v1/tours?duration[gte]=5&price[lt]=400&difficulty=easy
 
     // using find method to filter...
     // from req.query ?duration[gte]=5 ==> {duration: {gte: 5}}
@@ -34,16 +38,22 @@ exports.getAllTours = async function (req, res) {
     let query = Tour.find(queryStr);
 
     // 2). Sorting
+
+    // query => 127.0.0.1:3000/api/v1/tours?sort=-price,ratingsAverage (default = asc, -ve means desc)
+
     if (req.query.sort) {
       const sortBy = req.query.sort.split(",").join(" ");
 
       query = query.sort(sortBy);
       // query.sort("price ratingsAverage");
     } else {
-      query = query.sort("-createdAt");
+      query = query.sort("-createdAt").sort("_id");
     }
 
     // 3). Limiting the fields
+
+    // query => 127.0.0.1:3000/api/v1/tours?sort=-price,ratingsAverage
+
     if (req.query.fields) {
       const fieldsStr = req.query.fields.split(",").join(" ");
 
@@ -53,6 +63,25 @@ exports.getAllTours = async function (req, res) {
       query = query.select("-__v");
       // -ve sign in front of the field means to exclude that field...
     }
+
+    // 4). Pagination
+
+    // query => 127.0.0.1:3000/api/v1/tours?page=1&limit=10
+
+    const page = +req.query.page || 1;
+    const limit = +req.query.limit || 100;
+    const skip = (page - 1) * limit;
+
+    query = query.skip(skip).limit(limit);
+
+    if (req.query.page) {
+      const numTours = await Tour.countDocuments();
+      if (skip > numTours) throw new Error("This page does not exist");
+    }
+
+    // page=1&limit=10, 1-10, page=2&limit=10, 11-20, page=3&limit=10, 21-30
+    // for page = 3 and limit = 10
+    // query.skip(20).limit(10)
 
     //// CONSUMING QUERY WITH AWAIT...
     const tours = await query;
