@@ -40,16 +40,18 @@ exports.getAllTours = async function (req, res) {
       query = query.sort(sortBy);
       // query.sort("price ratingsAverage");
     } else {
-      query = query.sort("createdAt");
+      query = query.sort("-createdAt");
     }
 
-    // 3). Limiting
-    if (req.query.limit) {
-      const limitTo = req.query.limit;
+    // 3). Limiting the fields
+    if (req.query.fields) {
+      const fieldsStr = req.query.fields.split(",").join(" ");
 
-      query = query.limit(limitTo);
+      query = query.select(fieldsStr);
+      // query.select({name price description}), thats how the select(project) query works...
     } else {
-      query = query.limit(10);
+      query = query.select("-__v");
+      // -ve sign in front of the field means to exclude that field...
     }
 
     //// CONSUMING QUERY WITH AWAIT...
