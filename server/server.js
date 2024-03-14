@@ -1,3 +1,5 @@
+// NOTE: entry point for the app, all server related things, database configurations, some error handlings, and environment variables goes there...
+
 const dotenv = require("dotenv").config();
 const mongoose = require("mongoose");
 

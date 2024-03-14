@@ -1,6 +1,9 @@
+// NOTE: All Express related stuff goes here, (i.e. middlewares, routers etc)...
+
 const express = require("express");
 const morgan = require("morgan");
 
+// one separate router for each resource...
 const tourRouter = require("./routes/tourRoutes");
 const userRouter = require("./routes/userRoutes");
 

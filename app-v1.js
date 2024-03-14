@@ -26,10 +26,10 @@ app.use((req, res, next) => {
 // app.get("/", (req, res) => {
 //   res.status(200).send("this is the home page...");
 
-//   // NOTE: we can also use json() method to get/post json data from server, which automatically sets the "content-type" to "application/json" in header...
-//   // res
-//   //   .status(200)
-//   //   .json({ message: 'this is json data', app: 'from natours app' });
+// NOTE: we can also use json() method to get/post json data from server, which automatically sets the "content-type" to "application/json" in header...
+// res
+//   .status(200)
+//   .json({ message: 'this is json data', app: 'from natours app' });
 // });
 
 // // sends a post request to particular port when specified route is hit...
@@ -211,6 +211,8 @@ app.delete("/api/v1/tours/:id", deleteTour);
 // NOTE: we can also chain the routes, by using route() from express, which basically acts as a middleware...
 
 app.route("/api/v1/tours").get(getAllTours).post(createTour);
+
+// Multiple Params/Variables: -> /api/v1/tours/:id/:x/:y -> :y? = this will be optional parameter
 app
   .route("/api/v1/tours/:id")
   .get(getTour)
