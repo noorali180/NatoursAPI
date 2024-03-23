@@ -60,7 +60,6 @@ exports.getTour = async function (req, res) {
 exports.createTour = async function (req, res) {
   try {
     const newTour = await Tour.create(req.body);
-    console.log(newTour);
 
     res.status(201).json({
       status: "success",
@@ -78,8 +77,8 @@ exports.createTour = async function (req, res) {
 exports.updateTour = async function (req, res) {
   try {
     const updatedTour = await Tour.findByIdAndUpdate(req.params.id, req.body, {
-      new: true,
-      runValidators: true,
+      new: true, // return the new updated tour...
+      runValidators: true, // validators should run again, compare with schema...
     });
 
     res.status(201).json({
@@ -154,6 +153,8 @@ let query = Tour.find(queryStr);
 // 2). Sorting
 
 // query => 127.0.0.1:3000/api/v1/tours?sort=-price,ratingsAverage (default = asc, -ve means desc)
+// sort("-price ratingsAverage");
+// (-ve sign means desc order, AND +ve sign means asc order)...
 
 if (req.query.sort) {
   const sortBy = req.query.sort.split(",").join(" ");
@@ -166,7 +167,7 @@ if (req.query.sort) {
 
 // 3). Limiting the fields
 
-// query => 127.0.0.1:3000/api/v1/tours?sort=-price,ratingsAverage
+// query => 127.0.0.1:3000/api/v1/tours?sort=-price,ratingsAverage&fields=name,price,description
 
 if (req.query.fields) {
   const fieldsStr = req.query.fields.split(",").join(" ");
@@ -177,6 +178,8 @@ if (req.query.fields) {
   query = query.select("-__v");
   // -ve sign in front of the field means to exclude that field...
 }
+
+// NOTE: we can also add select property as {select: false}, in the schema to avoid a particular field from selecting or projecting...
 
 // 4). Pagination
 

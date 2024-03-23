@@ -1,7 +1,5 @@
 const fs = require("fs");
-const dotenv = require("dotenv").config({
-  path: "../../../natours-with_API/.env",
-});
+const dotenv = require("dotenv").config();
 
 const mongoose = require("mongoose");
 
