@@ -100,7 +100,6 @@ tourSchema.post("save", function (doc, next) {
 
 // 2). QUERY MIDDLEWARE
 
-/*
 // this middleware will run before every find query...
 // tourSchema.pre("find", function (next) {
 tourSchema.pre(/^find/, function (next) {
@@ -109,7 +108,6 @@ tourSchema.pre(/^find/, function (next) {
   // console.log(this); // this will point to the query object...
 
   this.find({ secretTour: { $ne: true } });
-
   this.start = Date.now();
 
   next();
@@ -117,14 +115,23 @@ tourSchema.pre(/^find/, function (next) {
 
 tourSchema.post(/^find/, function (docs, next) {
   console.log(`Query took ${Date.now() - this.start} milliseconds :)`);
-
   // console.log(docs); // docs will contain all the documents which have matched the query...
 
   next();
 });
-*/
 
 // 3). AGGREGATION MIDDLEWARE
+
+tourSchema.pre("aggregate", function (next) {
+  // console.log(this); // --> will point to the aggregation object...
+  console.log(this.pipeline()); // this will give the complete pipeline of aggregation object [array]...
+
+  this.pipeline().unshift({
+    $match: { secretTour: { $ne: true } },
+  });
+
+  next();
+});
 
 ////////////////////////////////////////////////////////////////////////////
 
