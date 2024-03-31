@@ -57,6 +57,11 @@ const tourSchema = new mongoose.Schema(
       select: false,
     },
     startDates: [Date],
+    // for query middleware example...
+    secretTour: {
+      type: Boolean,
+      default: false,
+    },
   },
   {
     toJSON: { virtuals: true },
@@ -78,20 +83,48 @@ tourSchema.virtual("durationWeeks").get(function () {
 // ii) Post Middleware (runs after the specified action triggers)
 
 // 1). DOCUMENT MIDDLEWARE
-// tourSchema.pre("save", function (next) {
-//   console.log(this); // console logs the saved document...
+/*
+tourSchema.pre("save", function (next) {
+  console.log(this); // console logs the saved document...
 
-//   next();
-// });
+  next();
+});
 // runs before or after .save(),and .create()
 
-// tourSchema.post("save", function (doc, next) {
-//   console.log(doc);
+tourSchema.post("save", function (doc, next) {
+  console.log(doc);
 
-//   next();
-// });
+  next();
+});
+*/
 
 // 2). QUERY MIDDLEWARE
+
+/*
+// this middleware will run before every find query...
+// tourSchema.pre("find", function (next) {
+tourSchema.pre(/^find/, function (next) {
+  // Note:  "/^find/" --> it is a regular expression which will cater all the find queries, such as find(), findById(), findOneAndUpdate() etc...
+
+  // console.log(this); // this will point to the query object...
+
+  this.find({ secretTour: { $ne: true } });
+
+  this.start = Date.now();
+
+  next();
+});
+
+tourSchema.post(/^find/, function (docs, next) {
+  console.log(`Query took ${Date.now() - this.start} milliseconds :)`);
+
+  // console.log(docs); // docs will contain all the documents which have matched the query...
+
+  next();
+});
+*/
+
+// 3). AGGREGATION MIDDLEWARE
 
 ////////////////////////////////////////////////////////////////////////////
 

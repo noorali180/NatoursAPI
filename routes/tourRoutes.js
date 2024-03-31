@@ -6,7 +6,6 @@ const router = express.Router();
 
 router.route("/tour-stats").get(tourController.getTourStats);
 router.route("/monthly-plan/:year").get(tourController.getMonthlyPlan);
-router.route("/virtuals").get(tourController.getVirtuals);
 // router.param("id", tourController.checkId); // param middleware...
 
 router
