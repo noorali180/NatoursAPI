@@ -89,7 +89,7 @@ exports.updateTour = async function (req, res) {
       },
     });
   } catch (err) {
-    res.status(404).json({
+    res.status(400).json({
       status: "fail",
       requestedTime: req.requestedTime,
       message: err,
@@ -101,7 +101,7 @@ exports.updateTour = async function (req, res) {
 exports.deleteTour = async function (req, res) {
   try {
     const deletedTour = await Tour.findByIdAndDelete(req.params.id);
-    res.status(203).json({
+    res.status(200).json({
       status: "success",
       requestedTime: req.requestedTime,
       data: {

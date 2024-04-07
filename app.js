@@ -37,6 +37,27 @@ app.all("*", (req, res, next) => {
     status: "fail",
     message: `Can't find ${req.originalUrl} on this server!`,
   });
+
+  next();
+});
+
+// ERROR HANDLING (with global error handling middleware)
+
+// express work with the error handling middleware to give us easy error handling out of the box, basically the goal is to define a global error handling middleware which will catch all the Errors coming from all over the application... either it is a operational error or programming error...
+
+// Step 1: create an error handling middleware
+// Step 2: create an error so this function will get called
+
+// GLOBAL ERROR HANDLING FUNCTION
+app.use((err, req, res, next) => {
+  // 4 parameters will help express to identify that it is an error handling middleware, 1st parameter will always be error...
+  err.statusCode = err.statusCode || 500; // 500 -> internal server error
+  err.status = err.status || "error";
+
+  err.status(err.statusCode).json({
+    status: err.status,
+    message: err.message,
+  });
 });
 
 module.exports = app;
