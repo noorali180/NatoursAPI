@@ -1,5 +1,7 @@
 // NOTE: All Express related stuff goes here, (i.e. middlewares, routers etc)...
 
+// NOTE: Middlewares will run as they are, in order in the codebase...
+
 const express = require("express");
 const morgan = require("morgan");
 

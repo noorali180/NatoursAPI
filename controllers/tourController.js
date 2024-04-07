@@ -69,7 +69,7 @@ exports.createTour = async function (req, res) {
       },
     });
   } catch (err) {
-    res.status(400).json({ status: "fail", message: "Invalid Data!" });
+    res.status(400).json({ status: "fail", message: err });
   }
 };
 
@@ -225,7 +225,6 @@ exports.getMonthlyPlan = async function (req, res) {
 };
 
 /////////////////////////////////////////////////////////////////////////////////////
-
 
 /*
 

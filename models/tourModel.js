@@ -44,7 +44,19 @@ const tourSchema = new mongoose.Schema(
       type: Number,
       required: [true, "A tour must have a price"],
     },
-    priceDiscount: Number,
+    priceDiscount: {
+      type: Number,
+      validate: {
+        // if the validator function returns false  then there is an error, and error message will be printed, if it returns true then there is no error...
+        // NOTE: this function will only work on creating a new tour (i.e. this --> points to the newly created object) BUT it will not work on updating a existing tour... && {VALUE} --> will contain the current value of the object...
+        // there are also libraries for custom validators in npm, we can just put these functions right there... for validations... (e.g.: validator.js)
+        // validate: [validator.function, "error_message"]
+        validator: function (val) {
+          return val < this.price;
+        },
+        message: "Discount price ({VALUE}) should be below regular price",
+      },
+    },
     summary: {
       type: String,
       trim: true,
