@@ -6,6 +6,7 @@ const express = require("express");
 const morgan = require("morgan");
 
 // one separate router for each resource...
+const AppError = require("./utils/appError")
 const tourRouter = require("./routes/tourRoutes");
 const userRouter = require("./routes/userRoutes");
 
