@@ -1,9 +1,26 @@
 const AppError = require("./../utils/appError");
 
+////////////////////////////////////////////////////////////////////////////////////////
 const handleCastErrorDB = (err) => {
   const message = `Invalid ${err.path}: ${err.value}`;
   return new AppError(message, 400);
 };
+
+const handleValidationErrorDB = (err) => {
+  const value = Object.values(err.errors)
+    .map((el) => el.message)
+    .join(", ");
+  const message = `Invalid input data: ${value}`;
+  return new AppError(message, 400);
+};
+
+const handleDuplicateFieldErrorDB = (err) => {
+  const value = err.message.match(/(["'])(?:\\.|[^\\])*?\1/);
+  const message = `Duplicate field value: ${value}. Please use another value!`;
+  return new AppError(message, 400);
+};
+
+///////////////////////////////////////////////////////////////////////////////////////
 
 // send error in development...
 const sendErrorDev = (err, res) => {
@@ -55,9 +72,12 @@ module.exports = (err, req, res, next) => {
     sendErrorDev(err, res);
   } else if (process.env.NODE_ENV === "production") {
     let error = { ...err };
-
     // 1) casting error (invalid id)
-    if (error.name === "CastError") error = handleCastErrorDB(error);
+    if (err.name === "CastError") error = handleCastErrorDB(err);
+    // 2) validation errors (mongoose validators)
+    if (err.name === "ValidationError") error = handleValidationErrorDB(err);
+    // 3) duplicate field name errors (which are modeled as unique)
+    if (err.code === 11000) error = handleDuplicateFieldErrorDB(err);
 
     sendErrorProd(error, res);
   }
