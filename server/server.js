@@ -3,6 +3,18 @@
 const dotenv = require("dotenv").config();
 const mongoose = require("mongoose");
 
+/////////////////////////////////////////////////////////////////////
+
+// Handling uncaught exceptions...
+// UNCAUGHT EXCEPTIONS are programming errors, bugs or all errors which occurs in our synchronous code... such as accessing a variable before declaring it...
+process.on("uncaughtException", (err) => {
+  console.log("UNCAUGHT EXCEPTION! 💥 Shutting down...");
+  console.log(err.name, err.message);
+  process.exit(1);
+});
+
+/////////////////////////////////////////////////////////////////////
+
 const app = require("../app");
 
 const DB = process.env.DATABASE.replace(
@@ -39,3 +51,5 @@ process.on("unhandledRejection", (err) => {
     process.exit(1); // 1 means unhandled exception, 0 means success...
   });
 });
+
+//////////////////////////////////////////////////////////////////////
