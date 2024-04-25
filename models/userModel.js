@@ -10,7 +10,7 @@ const userSchema = new mongoose.Schema({
     lowercase: true,
     validate: [validator.isEmail, "Please provide a valid email"],
   },
-  photo: { type: String },
+  photo: String,
   password: {
     type: String,
     required: [true, "Please provide a password"],
@@ -20,14 +20,15 @@ const userSchema = new mongoose.Schema({
     type: String,
     require: [true, "Please confirm your password"],
     validate: {
-      validator: function () {
-        return this === this.password;
+      // this only works on CREATE and SAVE
+      validator: function (el) {
+        return el === this.password;
       },
-      message: "Password does'nt match",
+      message: "Passwords are not the same!",
     },
   },
 });
 
 const User = mongoose.model("User", userSchema);
 
-exports.default = User;
+module.exports = User;
