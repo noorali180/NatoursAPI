@@ -42,7 +42,7 @@ exports.login = catchAsync(async (req, res, next) => {
   const user = await User.findOne({ email: email }).select("+password");
 
   if (!user || !(await user.checkPassword(password, user.password))) {
-    return next(new AppError("Incorrect email or password.", 401)); // 401 means incorrect credentials.
+    return next(new AppError("Incorrect email or password.", 401)); // 401 means unauthorized.
   }
 
   // 3). if everything is ok, send token to client
@@ -52,4 +52,31 @@ exports.login = catchAsync(async (req, res, next) => {
     status: "success",
     token,
   });
+});
+
+// this will be middleware function and will run before the execution of route handler e.g (getAllTours)
+exports.protect = catchAsync(async (req, res, next) => {
+  // 1) getting token pass in headers && check of it's true
+  let token;
+  // header -> authentication: Bearer "t...o.k..e....n"
+  if (
+    req.headers.authentication &&
+    req.headers.authentication.startsWith("Bearer")
+  ) {
+    token = req.headers.authentication.split(" ")[1];
+  }
+
+  if (!token) {
+    return next(
+      new AppError("You are not logged in! Please log in to get access.", 401)
+    );
+  }
+
+  console.log(token);
+  // 2) verification of token
+
+  // 3) check if user still exists
+
+  // 4) Check if user changed password after the JWT was issued
+  next();
 });
