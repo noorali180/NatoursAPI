@@ -1,4 +1,5 @@
 const jwt = require("jsonwebtoken");
+const { promisify } = require("util"); // utils is a built in library comes with node modules...
 
 const User = require("./../models/userModel");
 const catchAsync = require("./../utils/catchAsync");
@@ -72,10 +73,19 @@ exports.protect = catchAsync(async (req, res, next) => {
     );
   }
 
-  console.log(token);
   // 2) verification of token
+  const decodedToken = await promisify(jwt.verify)(
+    token,
+    process.env.JWT_SECRET
+  );
+  // { id: '662e761681580ac519c0437b', iat: 1714401503, exp: 1722177503 }
+  // will catch errors in our global error handling middleware...
 
   // 3) check if user still exists
+  // const freshUser = await User.findById(decodedToken.id);
+
+  // console.log(freshUser);
+  // if (!freshUser) return next(new AppError("no user found with this id,", 400));
 
   // 4) Check if user changed password after the JWT was issued
   next();
