@@ -12,12 +12,14 @@ const signToken = (id) => {
 };
 
 exports.signup = catchAsync(async (req, res, next) => {
-  const { name, email, password, passwordConfirm } = req.body;
+  const { name, email, password, passwordConfirm, passwordChangedAt } =
+    req.body;
   const newUser = await User.create({
     name,
     email,
     password,
     passwordConfirm,
+    passwordChangedAt,
   });
 
   // secret key, should be at least of 32 characters long string for more powerful and secure security...
@@ -79,14 +81,28 @@ exports.protect = catchAsync(async (req, res, next) => {
     process.env.JWT_SECRET
   );
   // { id: '662e761681580ac519c0437b', iat: 1714401503, exp: 1722177503 }
-  // will catch errors in our global error handling middleware...
+  // will catch errors in our global error handling middleware...i) invalid token, ii) token expired
 
   // 3) check if user still exists
-  // const freshUser = await User.findById(decodedToken.id);
+  const freshUser = await User.findById(decodedToken.id);
 
-  // console.log(freshUser);
-  // if (!freshUser) return next(new AppError("no user found with this id,", 400));
+  console.log(freshUser);
+  if (!freshUser)
+    return next(
+      new AppError(
+        "The user belonging to this token does no longer exist.",
+        401
+      )
+    );
 
-  // 4) Check if user changed password after the JWT was issued
+  // 4) Check if user changed password after the JWT was issued (by using instance method on user schema)
+  if (freshUser.changedPasswordAfter(decodedToken.iat)) {
+    return next(
+      new AppError("User recently changed password. Please login again!", 401)
+    );
+  }
+
+  req.user = freshUser;
+  // FINALLY GRANT ACCESS TO PROTECTED ROUTE...
   next();
 });

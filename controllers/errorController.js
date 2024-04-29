@@ -23,7 +23,7 @@ const handleDuplicateFieldErrorDB = (err) => {
 const handleJWTError = () =>
   new AppError("Invalid token. Please log in again!", 401);
 
-const handleJWTExpired = () =>
+const handleJWTExpiredError = () =>
   new AppError("Your token has expired. Please log in again!", 401);
 
 ///////////////////////////////////////////////////////////////////////////////////////
@@ -87,7 +87,8 @@ module.exports = (err, req, res, next) => {
     // 4_ invalid signature (JWT token)
     if (err.name === "JsonWebTokenError") error = handleJWTError();
     // 5_ token expired error (JWT token)
-    if (err.name === "TokenExpiredError") error = handleJWTExpired();
+    if (err.name === "TokenExpiredError") error = handleJWTExpiredError();
+
     sendErrorProd(error, res);
   }
 };

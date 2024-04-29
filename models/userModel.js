@@ -30,6 +30,10 @@ const userSchema = new mongoose.Schema({
       message: "Passwords are not the same!",
     },
   },
+  passwordChangedAt: {
+    type: Date,
+    default: Date.now(),
+  },
 });
 
 // Encryption and Decryption of passwords (using )
@@ -54,9 +58,25 @@ userSchema.pre("save", async function (next) {
 
 // candidatePassword --> not encrypted, simple
 // userPassword --> encrypted coming from database
-userSchema.methods.checkPassword = async function (candidatePassword, userPassword){
+userSchema.methods.checkPassword = async function (
+  candidatePassword,
+  userPassword
+) {
   return await bcrypt.compare(candidatePassword, userPassword);
-}
+};
+
+// func to check password is changed after the issuance of JWT token or not??
+userSchema.methods.changedPasswordAfter = function (JWTTimestamp) {
+  if (this.passwordChangedAt) {
+    const changedTimeStamp = parseInt(this.passwordChangedAt.getTime()) / 1000;
+
+    console.log(JWTTimestamp , changedTimeStamp);
+
+    if (JWTTimestamp < changedTimeStamp) return true; // 100 < 300 --> password changed true
+  }
+
+  return false; // if password is not changed then return false (by default)
+};
 
 /////////////////////////////////////////////////////
 
