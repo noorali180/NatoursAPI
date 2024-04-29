@@ -17,6 +17,7 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: [true, "Please provide a password"],
     minLength: 8,
+    select: false,
   },
   passwordConfirm: {
     type: String,
@@ -50,6 +51,12 @@ userSchema.pre("save", async function (next) {
 
   next();
 });
+
+// candidatePassword --> not encrypted, simple
+// userPassword --> encrypted coming from database
+userSchema.methods.checkPassword = async function (candidatePassword, userPassword){
+  return await bcrypt.compare(candidatePassword, userPassword);
+}
 
 /////////////////////////////////////////////////////
 
