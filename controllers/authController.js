@@ -58,6 +58,22 @@ exports.login = catchAsync(async (req, res, next) => {
   });
 });
 
+exports.forgotPassword = catchAsync(async (req, res, next) => {
+  // 1). check if user exists. Based on posted email
+  const user = await User.findOne({ email: req.body.email });
+
+  if (!user) {
+    return next(new AppError("There is no user with this email!", 404));
+  }
+
+  // 2). create a random reset password token (using built in library crypto)
+  const resetToken = user.createPasswordResetToken();
+  await user.save({validateBeforeSave: false});
+  // 3). send to user's email
+});
+
+exports.resetPassword = (req, res, next) => {};
+
 // this will be middleware function and will run before the execution of route handler e.g (getAllTours)
 exports.protect = catchAsync(async (req, res, next) => {
   // 1) getting token pass in headers && check of it's true

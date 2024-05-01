@@ -1,3 +1,4 @@
+const crypto = require("crypto");
 const mongoose = require("mongoose");
 const validator = require("validator");
 
@@ -39,6 +40,8 @@ const userSchema = new mongoose.Schema({
     type: Date,
     default: Date.now(),
   },
+  passwordResetToken: String,
+  passwordResetExpires: Date,
 });
 
 // Encryption and Decryption of passwords (using )
@@ -79,6 +82,21 @@ userSchema.methods.changedPasswordAfter = function (JWTTimestamp) {
   }
 
   return false; // if password is not changed then return false (by default)
+};
+
+// func to generate a random token (for forgot password)
+userSchema.methods.createPasswordResetToken = function () {
+  const resetToken = crypto.randomBytes(32).toString("hex"); // creating a random string of 32 bytes and converting it into hexadecimal string.
+
+  this.passwordResetToken = crypto
+    .createHash("sha256")
+    .update(resetToken)
+    .digest("hex"); // encrypt the created random token and save it to the data base along with expiration date.
+    console.log({resetToken}, this.passwordResetToken);
+
+  this.passwordResetExpires = Date.now() + 10 * 60 * 1000; // will expire in 10 minutes after creation.
+
+  return resetToken;
 };
 
 /////////////////////////////////////////////////////
