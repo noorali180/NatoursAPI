@@ -12,12 +12,13 @@ const signToken = (id) => {
 };
 
 exports.signup = catchAsync(async (req, res, next) => {
-  const { name, email, password, passwordConfirm, passwordChangedAt } =
+  const { name, email, role, password, passwordConfirm, passwordChangedAt } =
     req.body;
   const newUser = await User.create({
     name,
     email,
     password,
+    role,
     passwordConfirm,
     passwordChangedAt,
   });
@@ -105,3 +106,18 @@ exports.protect = catchAsync(async (req, res, next) => {
   // FINALLY GRANT ACCESS TO PROTECTED ROUTE...
   next();
 });
+
+// middle ware function, which will accepts some arguments of roles of a user and return a function to wether restrict the user or allow it to access some routes or do some manipulations, e.g (deleting a tour) only user with "admin" or "lead-guide" role should be able to delete a tour.
+
+exports.restrictTo = (...roles) => {
+  return (req, res, next) => {
+    // roles-> ["admin", "lead-guide"], req.user.role = "user"
+    if (!roles.includes(req.user.role)) {
+      return next(
+        new AppError("You do not have permission to perform this action", 403)
+      ); // 403 means--> forbidden
+    }
+
+    next();
+  };
+};
