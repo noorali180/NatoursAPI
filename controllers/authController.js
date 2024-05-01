@@ -63,10 +63,10 @@ exports.protect = catchAsync(async (req, res, next) => {
   let token;
   // header -> authentication: Bearer "t...o.k..e....n"
   if (
-    req.headers.authentication &&
-    req.headers.authentication.startsWith("Bearer")
+    req.headers.authorization &&
+    req.headers.authorization.startsWith("Bearer")
   ) {
-    token = req.headers.authentication.split(" ")[1];
+    token = req.headers.authorization.split(" ")[1];
   }
 
   if (!token) {
@@ -84,10 +84,9 @@ exports.protect = catchAsync(async (req, res, next) => {
   // will catch errors in our global error handling middleware...i) invalid token, ii) token expired
 
   // 3) check if user still exists
-  const freshUser = await User.findById(decodedToken.id);
+  const currentUser = await User.findById(decodedToken.id);
 
-  console.log(freshUser);
-  if (!freshUser)
+  if (!currentUser)
     return next(
       new AppError(
         "The user belonging to this token does no longer exist.",
@@ -96,13 +95,13 @@ exports.protect = catchAsync(async (req, res, next) => {
     );
 
   // 4) Check if user changed password after the JWT was issued (by using instance method on user schema)
-  if (freshUser.changedPasswordAfter(decodedToken.iat)) {
+  if (currentUser.changedPasswordAfter(decodedToken.iat)) {
     return next(
       new AppError("User recently changed password. Please login again!", 401)
     );
   }
 
-  req.user = freshUser;
+  req.user = currentUser;
   // FINALLY GRANT ACCESS TO PROTECTED ROUTE...
   next();
 });

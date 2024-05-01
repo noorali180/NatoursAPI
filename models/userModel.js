@@ -70,8 +70,6 @@ userSchema.methods.changedPasswordAfter = function (JWTTimestamp) {
   if (this.passwordChangedAt) {
     const changedTimeStamp = parseInt(this.passwordChangedAt.getTime()) / 1000;
 
-    console.log(JWTTimestamp , changedTimeStamp);
-
     if (JWTTimestamp < changedTimeStamp) return true; // 100 < 300 --> password changed true
   }
 
