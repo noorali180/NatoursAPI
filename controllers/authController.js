@@ -1,3 +1,4 @@
+const crypto = require("crypto");
 const jwt = require("jsonwebtoken");
 const { promisify } = require("util"); // utils is a built in library comes with node modules...
 
@@ -88,7 +89,7 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
       // html: "<h1>Reset your Password</h1>",
     });
   } catch (err) {
-    console.log("error occured in sending a mail", err);
+    console.log("error occurred in sending a mail", err);
     user.passwordResetToken = undefined;
     user.passwordResetExpires = undefined;
     await user.save({ validateBeforeSave: false });
@@ -107,7 +108,40 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
   });
 });
 
-exports.resetPassword = (req, res, next) => {};
+exports.resetPassword = catchAsync(async (req, res, next) => {
+  // 1) Get user based on the token (token coming from params)
+  const hashedToken = crypto
+    .createHash("sha256")
+    .update(req.params.token)
+    .digest("hex");
+
+  const user = await User.findOne({
+    passwordResetToken: hashedToken,
+    passwordResetExpires: { $gt: Date.now() },
+  });
+  //note: if passwordResetExpires property is greater than now, then its not expired (its in the future)
+
+  // 2) If token has not expired, and there is user, set the new password
+  if (!user) {
+    return next(new AppError("Token is invalid or has expired", 400));
+  }
+
+  user.password = req.body.password;
+  user.passwordConfirm = req.body.passwordConfirm;
+  user.passwordResetToken = undefined;
+  user.passwordResetExpires = undefined;
+
+  user.save();
+
+  // 3) Update changePasswordAt property for the user (whenever password is changed), we will do it using document middleware...
+  // 4) Log the user in, send JWT
+  const token = signToken(user._id);
+
+  res.status(200).json({
+    status: "success",
+    token,
+  });
+});
 
 // this will be middleware function and will run before the execution of route handler e.g (getAllTours)
 exports.protect = catchAsync(async (req, res, next) => {
