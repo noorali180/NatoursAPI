@@ -92,7 +92,6 @@ userSchema.methods.createPasswordResetToken = function () {
     .createHash("sha256")
     .update(resetToken)
     .digest("hex"); // encrypt the created random token and save it to the data base along with expiration date.
-    console.log({resetToken}, this.passwordResetToken);
 
   this.passwordResetExpires = Date.now() + 10 * 60 * 1000; // will expire in 10 minutes after creation.
 

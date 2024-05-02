@@ -4,6 +4,7 @@ const { promisify } = require("util"); // utils is a built in library comes with
 const User = require("./../models/userModel");
 const catchAsync = require("./../utils/catchAsync");
 const AppError = require("./../utils/appError");
+const sendEmail = require("./../utils/email");
 
 const signToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, {
@@ -67,9 +68,43 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
   }
 
   // 2). create a random reset password token (using built in library crypto)
-  const resetToken = user.createPasswordResetToken();
-  await user.save({validateBeforeSave: false});
+  const resetToken = user.createPasswordResetToken(); // plain token not encrypted.
+  await user.save({ validateBeforeSave: false });
+
   // 3). send to user's email
+  const resetURL = `${req.protocol}://${req.get(
+    "host"
+  )}/api/v1/users/resetPassword/${resetToken}`;
+
+  console.log(resetURL);
+
+  const message = `Forgot your password? Submit a PATCH request with your new password and passwordConfirm to: ${resetURL}.\nIf you didn't forget your password, please ignore this email!`;
+
+  try {
+    await sendEmail({
+      email: user.email,
+      subject: "Your password reset token (valid for 10 mins)",
+      message,
+      // html: "<h1>Reset your Password</h1>",
+    });
+  } catch (err) {
+    console.log("error occured in sending a mail", err);
+    user.passwordResetToken = undefined;
+    user.passwordResetExpires = undefined;
+    await user.save({ validateBeforeSave: false });
+
+    return next(
+      new AppError(
+        "There was an error sending the email. Try again later!",
+        500
+      )
+    );
+  }
+
+  res.status(200).json({
+    status: "success",
+    message: "Token sent to email!",
+  });
 });
 
 exports.resetPassword = (req, res, next) => {};
