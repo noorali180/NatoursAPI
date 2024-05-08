@@ -233,6 +233,7 @@ exports.protect = catchAsync(async (req, res, next) => {
     );
   }
 
+  // we need user id for updating passwords and user data...
   req.user = currentUser;
   // FINALLY GRANT ACCESS TO PROTECTED ROUTE...
   next();
