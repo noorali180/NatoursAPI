@@ -11,13 +11,22 @@ const filterObjFields = (obj, ...includedFields) => {
   return newObj;
 };
 
-exports.getAllUsers = function (req, res) {
-  res.status(500).json({ status: "failed", message: "route not defined" });
-};
+exports.getAllUsers = catchAsync(async function (req, res) {
+  const users = await User.find();
 
-exports.getUser = function (req, res) {
-  res.status(500).json({ status: "failed", message: "route not defined" });
-};
+  res.status(400).json({
+    status: "success",
+    data: {
+      users,
+    },
+  });
+});
+
+exports.getUser = catchAsync(async function (req, res) {
+  const user = await User.findById(req.params.id);
+
+  res.status(200).json({ status: "success", data: { user } });
+});
 
 // route to update user data only, not passwords (we have another route and handler for updating the current password of the user.)
 exports.updateMe = catchAsync(async function (req, res, next) {
@@ -45,6 +54,16 @@ exports.updateMe = catchAsync(async function (req, res, next) {
   res.status(200).json({
     status: "success",
     user: updatedUser,
+  });
+});
+
+// func to delete a current user, which is logged in, basically not deleting permanently from database, but temporarily marking it inactive.
+exports.deleteMe = catchAsync(async function (req, res, next) {
+  await User.findByIdAndUpdate(req.user.id, { active: false });
+
+  res.status(204).json({
+    status: "success",
+    data: null,
   });
 });
 
