@@ -13,6 +13,20 @@ const signToken = (id) => {
   });
 };
 
+const createSendToken = (user, statusCode, res) => {
+  const token = signToken(user._id);
+
+  res.status(statusCode).json({
+    status: "success",
+    token,
+    data: {
+      user,
+    },
+  });
+};
+
+///////////////////////////////////////////////////////////////
+
 exports.signup = catchAsync(async (req, res, next) => {
   const { name, email, role, password, passwordConfirm, passwordChangedAt } =
     req.body;
@@ -26,15 +40,18 @@ exports.signup = catchAsync(async (req, res, next) => {
   });
 
   // secret key, should be at least of 32 characters long string for more powerful and secure security...
-  const token = signToken(newUser._id);
 
-  res.status(201).json({
-    status: "success",
-    token,
-    data: {
-      user: newUser,
-    },
-  });
+  // const token = signToken(newUser._id);
+
+  // res.status(201).json({
+  //   status: "success",
+  //   token,
+  //   data: {
+  //     user: newUser,
+  //   },
+  // });
+
+  createSendToken(newUser, 201, res);
 });
 
 exports.login = catchAsync(async (req, res, next) => {
@@ -52,12 +69,15 @@ exports.login = catchAsync(async (req, res, next) => {
   }
 
   // 3). if everything is ok, send token to client
-  const token = signToken(user._id);
 
-  res.status(200).json({
-    status: "success",
-    token,
-  });
+  // const token = signToken(user._id);
+
+  // res.status(200).json({
+  //   status: "success",
+  //   token,
+  // });
+
+  createSendToken(user, 200, res);
 });
 
 exports.forgotPassword = catchAsync(async (req, res, next) => {
@@ -134,14 +154,40 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
   user.save();
 
   // 3) Update changePasswordAt property for the user (whenever password is changed), we will do it using document middleware...
-  // 4) Log the user in, send JWT
-  const token = signToken(user._id);
 
-  res.status(200).json({
-    status: "success",
-    token,
-  });
+  // 4) Log the user in, send JWT
+
+  // const token = signToken(user._id);
+
+  // res.status(200).json({
+  //   status: "success",
+  //   token,
+  // });
+
+  createSendToken(user, 200, res);
 });
+
+// func to update currently logged in user's password without resetting it...
+exports.updatePassword = catchAsync(async (req, res, next) => {
+  const { passwordOld, passwordNew, passwordConfirm } = req.body;
+  // 1). Get user from collection
+  const user = await User.findById(req.user.id).select("+password");
+
+  // 2). Check if posted current password (old password) is correct
+  if (!(await user.checkPassword(passwordOld, user.password))) {
+    return next(new AppError("Your current password is wrong", 401));
+  }
+
+  // 3). If so, update password
+  user.password = passwordNew;
+  user.passwordConfirm = passwordConfirm;
+  await user.save();
+
+  // 4). Log user in, send JWT
+  createSendToken(user, 200, res);
+});
+
+///////////////////////////////////////////////////////////////////////
 
 // this will be middleware function and will run before the execution of route handler e.g (getAllTours)
 exports.protect = catchAsync(async (req, res, next) => {

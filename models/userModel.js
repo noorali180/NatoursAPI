@@ -44,7 +44,10 @@ const userSchema = new mongoose.Schema({
   passwordResetExpires: Date,
 });
 
-// Encryption and Decryption of passwords (using )
+/////////////////////////////// MIDDLEWARES ////////////////////////////////////////////
+
+//
+// Encryption and Decryption of passwords (using bcrypt library)
 // in document middleware, time before saving any document.
 userSchema.pre("save", async function (next) {
   // if password is not modified then return from the function...
@@ -64,6 +67,7 @@ userSchema.pre("save", async function (next) {
   next();
 });
 
+//
 userSchema.pre("save", function (next) {
   if (!this.isModified("password") || this.isNew) return next();
 
@@ -72,7 +76,7 @@ userSchema.pre("save", function (next) {
   next();
 });
 
-////////////////////////////////////////////////////////////////
+/////////////////////////////// INSTANCE METHODS ////////////////////////////////////////////
 
 // candidatePassword --> not encrypted, simple
 // userPassword --> encrypted coming from database
@@ -108,7 +112,7 @@ userSchema.methods.createPasswordResetToken = function () {
   return resetToken;
 };
 
-/////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////
 
 const User = mongoose.model("User", userSchema);
 
