@@ -5,6 +5,7 @@
 const express = require("express");
 const morgan = require("morgan");
 const cookieParser = require("cookie-parser");
+const rateLimit = require("express-rate-limit");
 
 // one separate router for each resource...
 const AppError = require("./utils/appError");
@@ -19,6 +20,17 @@ const app = express();
 if (process.env.NODE_ENV === "development") {
   app.use(morgan("dev")); // middleware for logging request details,
 }
+
+// prevents an IP to make too many requests, which eventually helps in preventing the brute force attack and DOS attacks... (security measure)
+const limiter = rateLimit({
+  max: 100, // limit each IP to 100 requests per window...
+  windowMs: 60 * 60 * 1000, // 60 minutes...
+  // 100 requests each IP in 1 hour / 60 minutes,
+  message: "Too many requests from this IP, please try again in an hour!",
+  // error message if requests exceeds the limit specified
+});
+
+app.use("/api", limiter); // will apply to all routes starting with /api
 
 app.use(express.json());
 app.use(cookieParser());
