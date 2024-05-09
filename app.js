@@ -6,17 +6,23 @@ const express = require("express");
 const morgan = require("morgan");
 const cookieParser = require("cookie-parser");
 const rateLimit = require("express-rate-limit");
+const helmet = require("helmet");
 
 // one separate router for each resource...
-const AppError = require("./utils/appError");
-const globalErrorHandler = require("./controllers/errorController");
 const tourRouter = require("./routes/tourRoutes");
 const userRouter = require("./routes/userRoutes");
+
+const AppError = require("./utils/appError");
+const globalErrorHandler = require("./controllers/errorController");
 
 const app = express();
 
 /////////////////////////// 1). MIDDLEWARES /////////////////////////////////////
 
+// set http security headers...
+app.use(helmet());
+
+// logging in development
 if (process.env.NODE_ENV === "development") {
   app.use(morgan("dev")); // middleware for logging request details,
 }
@@ -32,8 +38,14 @@ const limiter = rateLimit({
 
 app.use("/api", limiter); // will apply to all routes starting with /api
 
-app.use(express.json());
+// to parse data from cookie...
 app.use(cookieParser());
+
+// body parser, reading data from body into req.body...
+app.use(express.json({ limit: "10kb" }));
+
+// Serving static files...
+app.use(express.static(`${__dirname}/public`));
 
 // creating a custom middleware...
 app.use((req, res, next) => {
