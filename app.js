@@ -4,6 +4,7 @@
 
 const express = require("express");
 const morgan = require("morgan");
+const cookieParser = require("cookie-parser");
 
 // one separate router for each resource...
 const AppError = require("./utils/appError");
@@ -20,6 +21,7 @@ if (process.env.NODE_ENV === "development") {
 }
 
 app.use(express.json());
+app.use(cookieParser());
 
 // creating a custom middleware...
 app.use((req, res, next) => {

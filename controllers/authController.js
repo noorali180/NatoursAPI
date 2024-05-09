@@ -16,6 +16,21 @@ const signToken = (id) => {
 const createSendToken = (user, statusCode, res) => {
   const token = signToken(user._id);
 
+  res.cookie("jwt", token, {
+    expires: new Date(
+      Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000
+    ),
+    // expires will set the date and time of expiration of the cookie. (we can also use maxAge)
+    // maxAge: process.env.JWT_EXPIRES_IN * 24 * 60 * 60 * 1000,
+    secret: process.env.NODE_ENV === "production" ? true : false,
+    // secret: if true then it will use encrypted path only which is https, (will not work in development if true, generates error)
+    httpOnly: true,
+    // httpOnly: provides cross site scripting security, client/browser can only read the cookie.
+  });
+
+  // remove password from output...
+  user.password = undefined;
+
   res.status(statusCode).json({
     status: "success",
     token,
@@ -96,8 +111,6 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
   const resetURL = `${req.protocol}://${req.get(
     "host"
   )}/api/v1/users/resetPassword/${resetToken}`;
-
-  console.log(resetURL);
 
   const message = `Forgot your password? Submit a PATCH request with your new password and passwordConfirm to: ${resetURL}.\nIf you didn't forget your password, please ignore this email!`;
 
