@@ -15,6 +15,7 @@ class APIFeatures {
     const excludedFields = ["page", "sort", "limit", "fields"];
     excludedFields.forEach((field) => delete queryObj[field]);
 
+    // {"price":"500","duration":{"gte":"5"}}
     let updatedQueryStr = JSON.stringify(queryObj);
     updatedQueryStr = JSON.parse(
       updatedQueryStr.replace(/\b(gte|gt|lte|lt)\b/g, (match) => `$${match}`)

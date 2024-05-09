@@ -9,6 +9,7 @@ const rateLimit = require("express-rate-limit");
 const helmet = require("helmet");
 const mongoSanitize = require("express-mongo-sanitize");
 const xss = require("xss-clean");
+const hpp = require("hpp");
 
 // one separate router for each resource...
 const tourRouter = require("./routes/tourRoutes");
@@ -51,6 +52,21 @@ app.use(mongoSanitize());
 
 // Data sanitization against XSS (cross site scripting attack)...
 app.use(xss());
+
+// Prevent parameter pollution...
+// {"price":["500","400"]} --> if duplicate fields in parameters mongoose will create an array from it.
+app.use(
+  hpp({
+    whitelist: [
+      "duration",
+      "ratingsQuantity",
+      "ratingsAverage",
+      "maxGroupSize",
+      "difficulty",
+      "price",
+    ],
+  })
+);
 
 // serving static files...
 app.use(express.static(`${__dirname}/public`));
