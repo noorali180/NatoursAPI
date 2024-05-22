@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const User = require("./userModel");
 
 // to do CRUD operations we need to create a mongoose model, and for model creation we need a schema...
 const tourSchema = new mongoose.Schema(
@@ -107,6 +108,9 @@ const tourSchema = new mongoose.Schema(
         day: Number,
       },
     ],
+
+    // child referencing the users / guides...
+    guides: Array, // NOTE: will use document middleware to fetch and embed the data from given id's through query.
   },
   {
     toJSON: { virtuals: true },
@@ -142,6 +146,15 @@ tourSchema.post("save", function (doc, next) {
   next();
 });
 */
+
+// middleware for embedding guides data to tours collection...
+tourSchema.pre("save", async function (next) {
+  const guidesPromises = this.guides.map(async (id) => await User.findById(id));
+  this.guides = await Promise.all(guidesPromises);
+
+  next();
+});
+// NOTE: it is not right to embed such data which can change regularly,
 
 // 2). QUERY MIDDLEWARE
 
