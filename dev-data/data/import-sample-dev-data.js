@@ -4,6 +4,8 @@ const dotenv = require("dotenv").config();
 const mongoose = require("mongoose");
 
 const Tour = require("./../../models/tourModel");
+const Review = require("./../../models/reviewModel");
+const User = require("./../../models/userModel");
 
 const DB = process.env.DATABASE.replace(
   "<PASSWORD>",
