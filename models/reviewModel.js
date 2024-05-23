@@ -15,12 +15,14 @@ const reviewSchema = new mongoose.Schema(
       type: Date,
       default: Date.now(),
     },
+    // parent referencing (Tour)
     tour: {
       type: mongoose.Schema.ObjectId,
       ref: "Tour",
       required: [true, "Review must belong to a tour"],
     },
 
+    // parent referencing (User)
     user: {
       type: mongoose.Schema.ObjectId,
       ref: "User",
@@ -40,10 +42,15 @@ const reviewSchema = new mongoose.Schema(
 // 2) QUERY MIDDLEWARE
 
 reviewSchema.pre(/^find/, function (next) {
+  // this.populate({
+  //   path: "tour",
+  //   select: "name",
+  // }).populate({
+  //   path: "user",
+  //   select: "name photo",
+  // });
+
   this.populate({
-    path: "tour",
-    select: "name",
-  }).populate({
     path: "user",
     select: "name photo",
   });

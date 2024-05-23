@@ -120,6 +120,8 @@ const tourSchema = new mongoose.Schema(
       },
       // NOTE: we will use the query middleware to populate the data...
     ],
+
+    // NOTE: we need each corresponding review about the tour in tour model, we can do it with child referencing but that is not the ideal way, so we will use virtual populate (virtually populating the data without persisting it in the DB).
   },
   {
     toJSON: { virtuals: true },
@@ -132,6 +134,13 @@ const tourSchema = new mongoose.Schema(
 // In Mongoose, virtual properties are properties that you can define on your schema but that do not get persisted to the database. Instead, they are computed properties based on other fields in your document or some other logic.
 tourSchema.virtual("durationWeeks").get(function () {
   return this.duration / 7;
+});
+
+// virtual populate (reviews)
+tourSchema.virtual("reviews", {
+  ref: "Review",
+  foreignField: "tour", // id of the tour in other collection (Review).
+  localField: "_id", // id of the tour in the local collection (Tour).
 });
 
 ////////////////// MIDDLEWARES IN MONGOOSE ////////////////////////
