@@ -2,9 +2,29 @@ const express = require("express");
 
 const tourController = require("./../controllers/tourController");
 const authController = require("./../controllers/authController");
-const reviewController = require("./../controllers/reviewController");
+const reviewRouter = require("./../routes/reviewRoutes");
 
 const router = express.Router();
+
+// How to GET or POST a review based on the TOUR id...
+
+// nested routes...
+
+// GET /tours/1234/reviews
+// POST /tours/1234/reviews
+// GET /tours/1234/reviews/1234
+
+// router
+//   .route("/:tourId/reviews")
+//   .post(
+//     authController.protect,
+//     authController.restrictTo("user"),
+//     reviewController.createReview
+//   );
+
+// NOTE: this is not an ideal way that the tour router is using the review controller we have separate both, we will use express advance feature of mergeParams in order to get tour params to review route, and using a middleware to tour route to redirect it to review route...
+
+router.use("/:tourId/reviews", reviewRouter);
 
 router.route("/tour-stats").get(tourController.getTourStats);
 router.route("/monthly-plan/:year").get(tourController.getMonthlyPlan);
@@ -26,22 +46,6 @@ router
     authController.protect,
     authController.restrictTo("admin", "lead-guide"),
     tourController.deleteTour
-  );
-
-// How to GET or POST a review based on the TOUR id...
-
-// nested routes...
-
-// GET /tours/1234/reviews
-// POST /tours/1234/reviews
-// GET /tours/1234/reviews/1234
-
-router
-  .route("/:tourId/reviews")
-  .post(
-    authController.protect,
-    authController.restrictTo("user"),
-    reviewController.createReview
   );
 
 module.exports = router;
