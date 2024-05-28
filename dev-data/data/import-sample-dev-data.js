@@ -22,10 +22,14 @@ mongoose
   });
 
 const tours = JSON.parse(fs.readFileSync(`${__dirname}/tours.json`));
+const users = JSON.parse(fs.readFileSync(`${__dirname}/users.json`));
+const reviews = JSON.parse(fs.readFileSync(`${__dirname}/reviews.json`));
 
 async function importData() {
   try {
     await Tour.create(tours);
+    await User.create(users);
+    await Review.create(reviews);
   } catch (err) {
     console.log(err);
   }
@@ -35,6 +39,8 @@ async function importData() {
 async function deleteData() {
   try {
     await Tour.deleteMany();
+    await User.deleteMany();
+    await Review.deleteMany();
   } catch (err) {
     console.log(err);
   }
