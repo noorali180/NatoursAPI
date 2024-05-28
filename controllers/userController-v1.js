@@ -1,8 +1,6 @@
-const User = require("../models/userModel.js");
 const AppError = require("../utils/appError.js");
 const catchAsync = require("../utils/catchAsync.js");
-const factory = require("./../controllers/factoryHandler");
-
+const User = require("../models/userModel.js");
 
 const filterObjFields = (obj, ...includedFields) => {
   const newObj = {};
@@ -69,13 +67,20 @@ exports.deleteMe = catchAsync(async function (req, res, next) {
   });
 });
 
-exports.createUser = (req, res) => {
-  res.status(500).json({
-    status: "error",
-    message: "This route is not defined! Please use /signup instead",
-  });
+exports.createUser = async function (req, res) {
+  try {
+    const newUser = await User.create(req.body);
+    console.log(newUser);
+    res.status(200).json({ status: "success", data: { user: newUser } });
+  } catch (err) {
+    res.status(400).json({ status: "failed", message: err });
+  }
 };
 
-// do not update password with this route, instead use forgot password route...
-exports.updateUser = factory.updateOne(User);
-exports.deleteUser = factory.deleteOne(User);
+exports.updateUser = function (req, res) {
+  res.status(500).json({ status: "failed", message: "route not defined" });
+};
+
+exports.deleteUser = function (req, res) {
+  res.status(500).json({ status: "failed", message: "route not defined" });
+};

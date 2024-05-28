@@ -1,5 +1,9 @@
-const factory = require("./../controllers/factoryHandler");
 const Tour = require("../models/tourModel");
+const factory = require("./../controllers/factoryHandler");
+const catchAsync = require("../utils/catchAsync.js");
+
+exports.getAll = factory.getAll(Tour);
+exports.getOne = factory.getOne(Tour, { path: "reviews" });
 
 exports.createTour = factory.createOne(Tour);
 exports.updateTour = factory.updateOne(Tour);
