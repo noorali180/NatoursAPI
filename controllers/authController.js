@@ -22,8 +22,8 @@ const createSendToken = (user, statusCode, res) => {
     ),
     // expires will set the date and time of expiration of the cookie. (we can also use maxAge)
     // maxAge: process.env.JWT_EXPIRES_IN * 24 * 60 * 60 * 1000,
-    secret: process.env.NODE_ENV === "production" ? true : false,
-    // secret: if true then it will use encrypted path only which is https, (will not work in development if true, generates error)
+    secure: process.env.NODE_ENV === "production" ? true : false,
+    // secure: if true then it will use encrypted path only which is https, (will not work in development if true, generates error)
     httpOnly: true,
     // httpOnly: provides cross site scripting security, client/browser can only read the cookie.
   });
@@ -212,6 +212,8 @@ exports.protect = catchAsync(async (req, res, next) => {
     req.headers.authorization.startsWith("Bearer")
   ) {
     token = req.headers.authorization.split(" ")[1];
+  } else if (req.cookies.jwt) {
+    token = req.cookies.jwt;
   }
 
   if (!token) {

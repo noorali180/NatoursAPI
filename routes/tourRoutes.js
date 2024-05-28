@@ -42,7 +42,7 @@ router
 // we can protect routes by using middlewares.
 router
   .route("/")
-  .get(authController.protect, tourController.getAllTours)
+  .get(tourController.getAllTours)
   .post(
     authController.protect,
     authController.restrictTo("admin", "lead-guide"),

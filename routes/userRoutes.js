@@ -11,15 +11,16 @@ router.post("/login", authController.login);
 router.post("/forgotPassword", authController.forgotPassword);
 router.patch("/resetPassword/:token", authController.resetPassword);
 
-// only log in user can access the route...
-router.patch(
-  "/updateMyPassword",
-  authController.protect,
-  authController.updatePassword
-);
+// routes defined after this middleware will be protected...
+router.use(authController.protect);
 
-router.patch("/updateMe", authController.protect, userController.updateMe);
-router.delete("/deleteMe", authController.protect, userController.deleteMe);
+// only log in user can access the route...
+router.patch("/updateMyPassword", authController.updatePassword);
+
+router.patch("/updateMe", userController.updateMe);
+router.delete("/deleteMe", userController.deleteMe);
+
+router.use(authController.restrictTo("admin"));
 
 router
   .route("/")
@@ -29,15 +30,6 @@ router
   .route("/:id")
   .get(userController.getUser)
   .patch(userController.updateUser)
-  .delete(
-    authController.protect,
-    authController.restrictTo("admin", "lead-guide"),
-    userController.deleteUser
-  );
+  .delete(userController.deleteUser);
 
 module.exports = router;
-
-/**
- * ! hello
- * TODO:
- */
