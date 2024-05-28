@@ -3,7 +3,6 @@ const AppError = require("../utils/appError.js");
 const catchAsync = require("../utils/catchAsync.js");
 const factory = require("./../controllers/factoryHandler");
 
-
 const filterObjFields = (obj, ...includedFields) => {
   const newObj = {};
   Object.keys(obj).forEach((el) => {
@@ -12,23 +11,6 @@ const filterObjFields = (obj, ...includedFields) => {
 
   return newObj;
 };
-
-exports.getAllUsers = catchAsync(async function (req, res) {
-  const users = await User.find();
-
-  res.status(400).json({
-    status: "success",
-    data: {
-      users,
-    },
-  });
-});
-
-exports.getUser = catchAsync(async function (req, res) {
-  const user = await User.findById(req.params.id);
-
-  res.status(200).json({ status: "success", data: { user } });
-});
 
 // route to update user data only, not passwords (we have another route and handler for updating the current password of the user.)
 exports.updateMe = catchAsync(async function (req, res, next) {
@@ -69,12 +51,17 @@ exports.deleteMe = catchAsync(async function (req, res, next) {
   });
 });
 
+//////////////////////////////////////////////////////////////////////////////
+
 exports.createUser = (req, res) => {
   res.status(500).json({
     status: "error",
     message: "This route is not defined! Please use /signup instead",
   });
 };
+
+exports.getAllUsers = factory.getAll(User);
+exports.getUser = factory.getOne(User);
 
 // do not update password with this route, instead use forgot password route...
 exports.updateUser = factory.updateOne(User);
