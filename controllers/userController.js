@@ -12,6 +12,12 @@ const filterObjFields = (obj, ...includedFields) => {
   return newObj;
 };
 
+exports.getMe = function (req, res, next) {
+  // in this function we will set the user id, as a request param so that we can get that the current user data from factory handler getOne() => which assumes that the user id will come as a request param.
+  req.params.id = req.user.id;
+  next();
+};
+
 // route to update user data only, not passwords (we have another route and handler for updating the current password of the user.)
 exports.updateMe = catchAsync(async function (req, res, next) {
   // 1). If data about password is posted to body then generate error and return

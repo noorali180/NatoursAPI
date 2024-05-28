@@ -16,7 +16,7 @@ router.use(authController.protect);
 
 // only log in user can access the route...
 router.patch("/updateMyPassword", authController.updatePassword);
-
+router.get("/me", userController.getMe, userController.getUser);
 router.patch("/updateMe", userController.updateMe);
 router.delete("/deleteMe", userController.deleteMe);
 
