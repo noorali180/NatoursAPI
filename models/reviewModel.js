@@ -1,5 +1,7 @@
 const mongoose = require("mongoose");
 
+const Tour = require("./tourModel");
+
 const reviewSchema = new mongoose.Schema(
   {
     review: {
@@ -35,9 +37,46 @@ const reviewSchema = new mongoose.Schema(
   }
 );
 
+///////////////////// STATIC FUNCTIONS //////////////////////////////
+// We can call static functions directly on model..
+
+// this function will take tour ID and aggregate on the basis of it and calculates the average rating and no. of ratings.
+reviewSchema.statics.calcAvgRatings = async function (tourId) {
+  // in this function "this" keyword will point on the current document
+  const stats = await this.aggregate([
+    {
+      $match: { tour: tourId },
+    },
+    {
+      $group: {
+        _id: "$tour",
+        nRatings: { $sum: 1 },
+        avgRating: { $avg: "$rating" },
+      },
+    },
+  ]);
+
+  // now we need to update the ratings quantity and no. of ratings in the Tour document...
+  // ratingsQuantity, ratingsAverage
+  await Tour.findByIdAndUpdate(tourId, {
+    ratingsQuantity: stats[0].nRatings,
+    ratingsAverage: stats[0].avgRating,
+  });
+};
+
+// NOTE: we have to run this function whenever a new rating is saved or an existing review is deleted, we can do it by using document middleware...
+
 ///////////////////// MIDDLEWARES //////////////////////////////
 
 // 1) DOCUMENT MIDDLEWARE
+reviewSchema.post("save", function () {
+  // the static function can be called upon the Model (Review Model)...
+  // Review.calcAvgRatings(this.tour); "this" will points to the current doc.
+
+  // this.constructor => this points the Model.
+
+  this.constructor.calcAvgRatings(this.tour);
+});
 
 // 2) QUERY MIDDLEWARE
 
