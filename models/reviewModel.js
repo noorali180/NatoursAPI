@@ -37,6 +37,9 @@ const reviewSchema = new mongoose.Schema(
   }
 );
 
+// avoid duplicate reviews, 1 user can only give 1 review to each tour...
+reviewSchema.index({ tour: 1, user: 1 }, { unique: true });
+
 ///////////////////// STATIC FUNCTIONS //////////////////////////////
 // We can call static functions directly on model..
 
