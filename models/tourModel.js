@@ -129,6 +129,10 @@ const tourSchema = new mongoose.Schema(
   }
 );
 
+// INDEXES
+tourSchema.index({ price: 1, ratingsAverage: -1 });
+tourSchema.index({ slug: 1 });
+
 // ({schemaDefinition}, {schemaOptions})
 
 // In Mongoose, virtual properties are properties that you can define on your schema but that do not get persisted to the database. Instead, they are computed properties based on other fields in your document or some other logic.
