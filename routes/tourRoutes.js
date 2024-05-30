@@ -39,6 +39,11 @@ router
   );
 // router.param("id", tourController.checkId); // param middleware...
 
+// /tours-within/:distance/center/:latlng/unit/:unit
+router
+  .route("/tours-within/:distance/center/:latlng/unit/:unit")
+  .get(tourController.getToursWithin);
+
 // we can protect routes by using middlewares.
 router
   .route("/")
