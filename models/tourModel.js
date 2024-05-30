@@ -218,9 +218,11 @@ tourSchema.pre("aggregate", function (next) {
   // console.log(this); // --> will point to the aggregation object...
   console.log(this.pipeline()); // this will give the complete pipeline of aggregation object [array]...
 
-  this.pipeline().unshift({
-    $match: { secretTour: { $ne: true } },
-  });
+  if (!this.pipeline()[0].$geoNear) {
+    this.pipeline().unshift({
+      $match: { secretTour: { $ne: true } },
+    });
+  }
 
   next();
 });

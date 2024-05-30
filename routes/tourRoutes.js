@@ -44,6 +44,9 @@ router
   .route("/tours-within/:distance/center/:latlng/unit/:unit")
   .get(tourController.getToursWithin);
 
+// /distances/:latlng/unit/:unit
+router.route("/distances/:latlng/unit/:unit").get(tourController.getDistances);
+
 // we can protect routes by using middlewares.
 router
   .route("/")

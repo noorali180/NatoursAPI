@@ -110,7 +110,12 @@ exports.getToursWithin = catchAsync(async (req, res, next) => {
   const { distance, latlng, unit } = req.params;
   const [lat, lng] = latlng.split(",");
 
-  const radius = unit === "mi" ? distance / 3963.2 : distance / 6378.1;
+  const radius =
+    unit === "mi"
+      ? distance / 3963.2
+      : unit === "km"
+      ? distance / 6378.1
+      : undefined;
 
   if (!lat || !lng)
     return next(
@@ -119,6 +124,9 @@ exports.getToursWithin = catchAsync(async (req, res, next) => {
         400
       )
     );
+
+  if (!radius)
+    return next(new AppError("please provide a valid unit for distances", 400));
 
   // Geospatial query.
   const tours = await Tour.find({
@@ -132,6 +140,56 @@ exports.getToursWithin = catchAsync(async (req, res, next) => {
     results: tours.length,
     data: {
       data: tours,
+    },
+  });
+});
+
+// /distances/:latlng/unit/:unit
+// /distances/34.111745,-118.113491/unit/mi
+
+exports.getDistances = catchAsync(async (req, res, next) => {
+  const { latlng, unit } = req.params;
+  const [lat, lng] = latlng.split(",");
+
+  const multiplier =
+    unit === "mi" ? 0.000621371 : unit === "km" ? 0.001 : undefined;
+
+  if (!lat || !lng)
+    return next(
+      new AppError(
+        "please provide latitude and longitude in the format lat, lng",
+        400
+      )
+    );
+
+  if (!multiplier)
+    return next(new AppError("please provide a valid unit for distances", 400));
+
+  // in aggregation pipeline $geoNear should be first stage. it will be GeoJson Point ("near")
+  // distanceField will contain the calculated distances.
+  const distances = await Tour.aggregate([
+    {
+      $geoNear: {
+        near: {
+          type: "Point",
+          coordinates: [lng * 1, lat * 1],
+        },
+        distanceField: "distance",
+        distanceMultiplier: multiplier,
+      },
+    },
+    {
+      $project: {
+        name: 1,
+        distance: 1,
+      },
+    },
+  ]);
+
+  res.status(200).json({
+    status: "success",
+    data: {
+      data: distances,
     },
   });
 });
