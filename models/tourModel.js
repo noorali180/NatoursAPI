@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const slugify = require("slugify");
 // const User = require("./userModel");
 
 // to do CRUD operations we need to create a mongoose model, and for model creation we need a schema...
@@ -13,6 +14,11 @@ const tourSchema = new mongoose.Schema(
       trim: true,
       maxLength: [40, "A tour name must have less or equal then 40 characters"],
       minLength: [10, "A tour name must have more or equal then 10 characters"],
+    },
+    slug: String,
+    duration: {
+      type: Number,
+      required: [true, "A tour must have a duration"],
     },
     duration: {
       type: Number,
@@ -179,6 +185,12 @@ tourSchema.post("save", function (doc, next) {
 //   next();
 // });
 // NOTE: it is not right to embed such data which can change regularly,
+
+// DOCUMENT MIDDLEWARE: runs before .save() and .create()
+tourSchema.pre("save", function (next) {
+  this.slug = slugify(this.name, { lower: true });
+  next();
+});
 
 // 2). QUERY MIDDLEWARE
 
