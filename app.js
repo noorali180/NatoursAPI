@@ -2,6 +2,7 @@
 
 // NOTE: Middlewares will run as they are, in order in the codebase...
 
+const path = require("path");
 const express = require("express");
 const morgan = require("morgan");
 const cookieParser = require("cookie-parser");
@@ -21,7 +22,15 @@ const globalErrorHandler = require("./controllers/errorController");
 
 const app = express();
 
+// setting pug as a view engine.
+app.set("view engine", "pug");
+app.set("views", path.join(__dirname, "views"));
+
 /////////////////////////// 1). MIDDLEWARES /////////////////////////////////////
+
+// serving static files...
+// app.use(express.static(`${__dirname}/public`));
+app.use(express.static(path.join(__dirname, "public")));
 
 // set http security headers...
 app.use(helmet());
@@ -69,9 +78,6 @@ app.use(
   })
 );
 
-// serving static files...
-app.use(express.static(`${__dirname}/public`));
-
 // creating a custom middleware...
 app.use((req, res, next) => {
   req.requestedTime = new Date().toISOString();
@@ -79,6 +85,13 @@ app.use((req, res, next) => {
 });
 
 /////////////////////////////////////////////
+
+app.get("/", (req, res, next) => {
+  res.status(200).render("base", {
+    tour: 'The Wild Camper',
+    user: 'Noor Ali'
+  });
+});
 
 app.use("/api/v1/tours", tourRouter);
 app.use("/api/v1/users", userRouter);
