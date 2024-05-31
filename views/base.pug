@@ -13,7 +13,7 @@ html
         include _header
 
         //SECTION
-        section.main 
+        block content
             h1 Noor Ali
 
         //FOOTER
@@ -28,3 +28,5 @@ html
 //- p  This is some text
 //- -const x = 9
 //- h3= 3 * x
+
+//- include means including the child template into a parent template, in this case base is a parent template and _header and _footer are the child templates. (parent renders the child)
