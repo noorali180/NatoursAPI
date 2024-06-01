@@ -13,8 +13,19 @@ exports.getOverview = catchAsync(async (req, res) => {
   });
 });
 
-exports.getTour = (req, res) => {
+exports.getTour = catchAsync(async (req, res) => {
+  // 1) get tour from database
+  const tour = await Tour.findOne({ slug: req.params.slug }).populate({
+    path: "reviews",
+    fields: "review rating user",
+  });
+
+  console.log(tour);
+
+  // 2) create template
+  // 3) render the page
   res.status(200).render("tour", {
     title: "The River Run",
+    tour,
   });
-};
+});

@@ -607,7 +607,21 @@ body {
   overflow-x: scroll;
   -ms-scroll-snap-type: x mandatory;
   scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
 }
+
+.reviews:active {
+  cursor: grabbing;
+}
+
+.reviews:active .reviews__card {
+  user-select: none;
+}
+
+/* .reviews::-webkit-scrollbar {
+  display: none;
+} */
+
 .reviews__card {
   width: 30rem;
   padding: 4rem;
