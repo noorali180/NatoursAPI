@@ -23,7 +23,16 @@ exports.getTour = catchAsync(async (req, res) => {
   // 2) create template
   // 3) render the page
   res.status(200).render("tour", {
-    title: "The River Run",
+    title: `${tour.name} Tour`,
     tour,
   });
 });
+
+exports.login = catchAsync(async (req, res) => {
+  // 1). check user and login
+
+  // 2). create template
+
+  // 3). render template
+  res.status(200).render('loginScreen');
+})
