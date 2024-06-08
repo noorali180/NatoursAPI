@@ -16,8 +16,6 @@ const signToken = (id) => {
 const createSendToken = (user, statusCode, res) => {
   const token = signToken(user._id);
 
-  console.log(`console.log token: ${token}`);
-
   res.cookie("jwt", token, {
     expires: new Date(
       Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000
@@ -25,9 +23,11 @@ const createSendToken = (user, statusCode, res) => {
     // expires will set the date and time of expiration of the cookie. (we can also use maxAge)
     // maxAge: process.env.JWT_EXPIRES_IN * 24 * 60 * 60 * 1000,
     secure: process.env.NODE_ENV === "production" ? true : false,
+    // secure: true,
     // secure: if true then it will use encrypted path only which is https, (will not work in development if true, generates error)
     httpOnly: true,
     // httpOnly: provides cross site scripting security, client/browser can only read the cookie.
+    // sameSite: "none",
   });
 
   // remove password from output...

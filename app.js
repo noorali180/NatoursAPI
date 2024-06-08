@@ -87,6 +87,7 @@ app.use(
 app.use(
   cors({
     origin: "http://localhost:3000", // Only allow this origin
+    credentials: true,
   })
 );
 
