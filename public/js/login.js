@@ -1,15 +1,13 @@
 const loginForm = document.querySelector(".form__login");
 
 const login = async function (email, password) {
-  console.log("hello");
   try {
-    const res = await axios({
+    const res = await axios("http://127.0.0.1:3000/api/v1/users/login", {
       method: "POST",
-      url: "http://127.0.0.1:3000/api/v1/users/login",
-      data: {
-        email,
-        password,
+      headers: {
+        "Content-Type": "application/json", // specify the content type as JSON
       },
+      data: JSON.stringify({ email: email, password: password }),
     });
 
     console.log(res);

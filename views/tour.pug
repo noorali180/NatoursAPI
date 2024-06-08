@@ -4,6 +4,9 @@ block append head
     script(src='https://api.mapbox.com/mapbox-gl-js/v3.4.0/mapbox-gl.js')
     link(href='https://api.mapbox.com/mapbox-gl-js/v3.4.0/mapbox-gl.css' rel='stylesheet')
 
+block scripts
+    script(src='/js/mapBox.js')
+
 include _review
 
 mixin overViewBox(label, text, icon)
@@ -77,7 +80,8 @@ block content
         //- .picture-box
         //-     img.picture-box__img.picture-box__img--3(src='/img/tour-5-3.jpg', alt='The Park Camper Tour 1')
 
-    section.section-map
+    - const locations = JSON.stringify(tour.locations);
+    section.section-map(data-locations=`${locations}`)
         #map
 
     section.section-reviews
